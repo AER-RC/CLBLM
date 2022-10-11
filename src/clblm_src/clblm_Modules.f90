@@ -1,0 +1,34 @@
+MODULE CLBLM_Modules
+
+   USE Module_AtmPath
+   USE Module_Config
+   USE Module_ConstParam
+   USE Module_Continuum
+   USE Module_FileIO
+   USE Module_DV
+   USE Module_Drivers
+   USE Module_EMLAY
+   USE Module_FFT
+   USE Module_LineData
+   USE Module_LineF4
+   USE Module_ODLAY
+   USE Module_ODLAY_CommonSub 
+   USE Module_PostProc
+   USE Module_noScattRT
+   USE Module_noScattJac
+   USE Module_ScanFilter
+   USE Module_Scene
+   USE Module_Solar
+   USE Module_Spectrum
+   USE Module_TIPS
+   USE Module_Utility
+   USE Module_XSect
+   USE planet_consts
+   USE solar_cycle
+   use jsonconfig
+   use json_data_types
+   use validateJSONmodule
+   use JsonModule
+   use jsonfile
+   
+END MODULE

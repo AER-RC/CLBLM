@@ -1,0 +1,11 @@
+Dockerfile
+modules/*.mod
+*.a
+*.tgz
+bak/*
+test/*
+scratch/*
+clblm_out_*
+*.log
+z_*
+zz_*
