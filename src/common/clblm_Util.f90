@@ -209,7 +209,7 @@ CONTAINS !===================== MODULE CONTAIS =========================
 
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
-    subroutine splitFilePath(fullpath, basename, directory)
+    subroutine splitFilePath(fullpath, directory, basename)
 !-----------------------------------------------------------------------
         implicit none
 
