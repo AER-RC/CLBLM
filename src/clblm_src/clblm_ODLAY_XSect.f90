@@ -383,8 +383,6 @@ CONTAINS !=====================Module Contians==========================
       REAL     :: WXM1,   WXM2,   XKT
 
 
-
-
       NLIMX = 510
       LIMOUT = 13000
       IRPEAT = 0
@@ -489,6 +487,8 @@ CONTAINS !=====================Module Contians==========================
                                   XSTEMP,XSMAX,PDX,RDX1(5:),RDX2(5:),NFHDRF,NPHDRF )
                      !CALL CPUTIM (TIME)
                      !TXSRDF = TXSRDF+TIME-TIME0
+!
+
 
 !     CHECK FOR WAVENUMBER BOUNDS AND SMALLEST DV
 
@@ -675,6 +675,7 @@ CONTAINS !=====================Module Contians==========================
                      CALL XINT (V1FP,V2FP,DVFXX,RDX2,WXM2,V1X,DVX,RX,N1RX,N2RX)
                   ENDIF
                   CALL XINT (V1FP,V2FP,DVFXX,RDX1,WXM1,V1X,DVX,RX,N1RX,N2RX)
+                  
                   !CALL CPUTIM (TIME)
                   !TXSPNL = TXSPNL+TIME-TIME0
 
@@ -852,6 +853,8 @@ CONTAINS !=====================Module Contians==========================
       REAL     :: PNLHDR(2),DUM(2)
       EQUIVALENCE (V1PX, PNLHDR(1))
 
+      integer :: kk
+
 
       !%%%%%LINUX_PGI90 (-i8)%%%%%      integer*4 iostat
       !real :: RDXX1(516),RDXX2(516), &
@@ -933,6 +936,7 @@ CONTAINS !=====================Module Contians==========================
             REWIND JFILE
          ENDIF
 
+
 !     HEADER: 86 FORMAT
 !
 !             AMOL,V1,V2,NPTS,BMOL,PRES,ICM,ITEMP,SOURCE
@@ -943,6 +947,7 @@ CONTAINS !=====================Module Contians==========================
 !
 !
 !     IAFORM < 100, UNBLOCKED DATA (100 CHARACTERS/RECORD)
+
 !
          IF (IAFORM.LT.100) THEN
             READ (IFILE,900,END=30) HEADER
@@ -999,12 +1004,12 @@ CONTAINS !=====================Module Contians==========================
             IF (ISFORM.GT.0) THEN
                READ (IFILE,915,END=30) HEADER,(RDX1(J),J=1,500) !(RDXX1(J),J=1,500)
             ELSE
-               CALL BUFIN (IFILE,IEOF,FILHDR(1),NFHDRF)
+               CALL BUFIN_sgl (IFILE,IEOF,FILHDR(1),NFHDRF*2)
                IF (IEOF.LE.0) GO TO 30
                WRITE (HEADER,'(10A8)') XI1
-               CALL BUFIN (IFILE,IEOF,PNLHDR(1),NPHDRF)
+               CALL BUFIN_sgl (IFILE,IEOF,PNLHDR(1),NPHDRF*2)
                IF (IEOF.LE.0) GO TO 30
-               CALL BUFIN( IFILE,IEOF,RDX1(1),NLIMPX) !(IFILE,IEOF,RDXH1(1),NLIMPX)
+               CALL BUFIN_sgl( IFILE,IEOF,RDX1(1),NLIMPX*2) !(IFILE,IEOF,RDXH1(1),NLIMPX)
             ENDIF
             HEADT1(NI) = HEADER
             IF (IMFORM.EQ.86) THEN
@@ -1032,12 +1037,12 @@ CONTAINS !=====================Module Contians==========================
                IF (ISFORM.GT.0) THEN
                   READ (JFILE,915,END=30) HEADER,(RDX2(J),J=1,500) !(RDXX2(J),J=1,500)
                ELSE
-                  CALL BUFIN (JFILE,JEOF,FILHDR(1),NFHDRF)
+                  CALL BUFIN_sgl (JFILE,JEOF,FILHDR(1),NFHDRF*2)
                   IF (JEOF.LE.0) GO TO 30
                   WRITE (HEADER,'(10A8)') XI1
-                  CALL BUFIN (JFILE,JEOF,PNLHDR(1),NPHDRF)
+                  CALL BUFIN_sgl (JFILE,JEOF,PNLHDR(1),NPHDRF*2)
                   IF (JEOF.LE.0) GO TO 30
-                  CALL BUFIN( JFILE,JEOF,RDX2(1),NLIMPX) !(JFILE,JEOF,RDXH2(1),NLIMPX)
+                  CALL BUFIN_sgl( JFILE,JEOF,RDX2(1),NLIMPX*2) !(JFILE,JEOF,RDXH2(1),NLIMPX)
                ENDIF
                IF (IMFORM.EQ.86) THEN
                   READ (HEADER,905) AMOL,V1DX,V2DX,NPTSDX,BMOL,PRES,    &
@@ -1079,13 +1084,13 @@ CONTAINS !=====================Module Contians==========================
                   READ (IFILE,920,END=30) CI
                   IF (NXMODE.EQ.2) READ (JFILE,920,END=30) CI
                ELSE
-                  CALL BUFIN (IFILE,IEOF,PNLHDR(1),NPHDRF)
+                  CALL BUFIN_sgl (IFILE,IEOF,PNLHDR(1),NPHDRF*2)
                   IF (IEOF.LE.0) GO TO 30
-                  CALL BUFIN (IFILE,IEOF,DUM(1),1)
+                  CALL BUFIN_sgl (IFILE,IEOF,DUM(1),1*2)
                   IF (NXMODE.EQ.2) THEN
-                     CALL BUFIN (JFILE,JEOF,PNLHDR(1),NPHDRF)
+                     CALL BUFIN_sgl (JFILE,JEOF,PNLHDR(1),NPHDRF*2)
                      IF (JEOF.LE.0) GO TO 30
-                     CALL BUFIN (JFILE,JEOF,DUM(1),1)
+                     CALL BUFIN_sgl (JFILE,JEOF,DUM(1),1*2)
                   ENDIF
                ENDIF
    10       CONTINUE
@@ -1101,13 +1106,13 @@ CONTAINS !=====================Module Contians==========================
             READ (IFILE,BFRM,END=30) (RDX1(J),J=1,NMAX) !(RDXX1(J),J=1,NMAX)
             IF (NXMODE.EQ.2) READ (JFILE,BFRM,END=30) (RDX2(J),J=1,NMAX) !(RDXX2(J),J=1,NMAX)
          ELSE
-            CALL BUFIN (IFILE,IEOF,PNLHDR(1),NPHDRF)
+            CALL BUFIN_sgl (IFILE,IEOF,PNLHDR(1),NPHDRF*2)
             IF (IEOF.LE.0) GO TO 30
-            CALL BUFIN( IFILE,IEOF,RDX1(1),NLIMPX) !(IFILE,IEOF,RDXA1(1),NLIMPX)
+            CALL BUFIN_sgl( IFILE,IEOF,RDX1(1),NLIMPX*2) !(IFILE,IEOF,RDXA1(1),NLIMPX)
             IF (NXMODE.EQ.2) THEN
-               CALL BUFIN (JFILE,JEOF,PNLHDR(1),NPHDRF)
+               CALL BUFIN_sgl (JFILE,JEOF,PNLHDR(1),NPHDRF*2)
                IF (JEOF.LE.0) GO TO 30
-               CALL BUFIN( JFILE,JEOF,RDX2(1),NLIMPX) !(JFILE,JEOF,RDXA2(1),NLIMPX)
+               CALL BUFIN_sgl( JFILE,JEOF,RDX2(1),NLIMPX*2) !(JFILE,JEOF,RDXA2(1),NLIMPX)
             ENDIF
          ENDIF
       ENDIF
@@ -1397,9 +1402,9 @@ CONTAINS !=====================Module Contians==========================
          IF (OPCL) CLOSE (IFILEO)
          OPEN (IFILEO,FILE=trim(tmpxbinFile),STATUS='UNKNOWN',FORM='UNFORMATTED')
          REWIND IFILEO
-         CALL BUFOUT (IFILEO,FILHDS(1),NFHDRF)
+         CALL BUFOUT_sgl (IFILEO,FILHDS(1),NFHDRF*2)
          REWIND IFILEO
-         CALL BUFIN (IFILEO,IEOF,FILHDR(1),NFHDRF)
+         CALL BUFIN_sgl (IFILEO,IEOF,FILHDR(1),NFHDRF*2)
          READ (HEADT1(NI),'(10A8)') XI1
       ENDIF
       REWIND IFILEO
@@ -1447,15 +1452,15 @@ CONTAINS !=====================Module Contians==========================
             XSCID = -99
             ISCHDR = 0
             IEMIT = 0
-            CALL BUFOUT (IFILEO,FILHDR(1),NFHDRF)
+            CALL BUFOUT_sgl (IFILEO,FILHDR(1),NFHDRF*2)
          ENDIF
 
          IF (IOTPAN.EQ.5.OR.NP.EQ.NPAN) THEN
             IOTPAN = 1
             DVPX = DVFX(NS,NI)
             NLIMPX = LPMAX
-            CALL BUFOUT (IFILEO,PNLHDR(1),NPHDRF)
-            CALL BUFOUT (IFILEO,RBX(1),NLIMPX)
+            CALL BUFOUT_sgl (IFILEO,PNLHDR(1),NPHDRF*2)
+            CALL BUFOUT_sgl (IFILEO,RBX(1),NLIMPX*2)
             LPMAX = 0
             V1PX = V2PX+DVFX(NS,NI)
          ENDIF
@@ -1609,7 +1614,7 @@ CONTAINS !=====================Module Contians==========================
       SUMR(4) = DVOSAV
 
       REWIND IUNIT
-      CALL BUFIN (IUNIT,IEOF,FILHDR(1),NFHDRF)
+      CALL BUFIN_sgl (IUNIT,IEOF,FILHDR(1),NFHDRF*2)
       IF (IEOF.EQ.0) GO TO 50
 
       DVSAV = DV
@@ -1631,7 +1636,7 @@ CONTAINS !=====================Module Contians==========================
       V2C = V2
       XHWHM = HWHM
       IEMIT = 0
-      CALL BUFOUT (JUNIT,FILHDR(1),NFHDRF)
+      CALL BUFOUT_sgl (JUNIT,FILHDR(1),NFHDRF*2)
       NBOUND = (2.*HWF)*SAMPLE+0.01
 
 !     BOUND AT THIS POINT IS THE WAVENUMBER VALUE
@@ -1681,6 +1686,7 @@ CONTAINS !=====================Module Contians==========================
       CALL CONVSC( S,HWHM,R1,XF, &
                    HWF,DXF,V1I,DVI,ILO,IHI,MAXF,VFT,V1,DVO,&
                    JVAR,IDATA,IPANEL )
+
 
       IF (IPANEL.EQ.0) GO TO 20
 
@@ -1771,8 +1777,8 @@ CONTAINS !=====================Module Contians==========================
 !     V1P IS FIRST FREQ OF PANEL
 !     V2P IS LAST  FREQ OF PANEL
 !
-      CALL BUFOUT (JFILE,PNLHDR(1),NPHDRF)
-      CALL BUFOUT (JFILE,R1(NLO),NLIM)
+      CALL BUFOUT_sgl (JFILE,PNLHDR(1),NPHDRF*2)
+      CALL BUFOUT_sgl (JFILE,R1(NLO),NLIM*2)
 
       VFT = VFT+ REAL(NLIMF-1)*DV
       DVXPR(NS,NI) = DV
@@ -1908,7 +1914,7 @@ CONTAINS !=====================Module Contians==========================
          IF (JTREM.EQ.2) IDUM2 = 1
       ENDIF
 
-   10 CALL BUFIN (IFILE,IEOFSC,PNLHDR(1),NPHDRF)
+   10 CALL BUFIN_sgl (IFILE,IEOFSC,PNLHDR(1),NPHDRF*2)
          IF (IEOFSC.LE.0) GO TO 50
 !------------->>>yma 160613
          VMIN = cmVMIN
@@ -1927,13 +1933,13 @@ CONTAINS !=====================Module Contians==========================
          IDATA = 0
          IF (VMAX.GE.VBOT) GO TO 20
 
-         IF (IDUM2.EQ.1) CALL BUFIN (IFILE,IEOFSC,DUMMY(1),1)
-         CALL BUFIN (IFILE,IEOFSC,DUMMY(1),2)
-         IF (IDUM1.EQ.1) CALL BUFIN (IFILE,IEOFSC,DUMMY(1),1)
+         IF (IDUM2.EQ.1) CALL BUFIN_sgl (IFILE,IEOFSC,DUMMY(1),1*2)
+         CALL BUFIN_sgl (IFILE,IEOFSC,DUMMY(1),2*2)
+         IF (IDUM1.EQ.1) CALL BUFIN_sgl (IFILE,IEOFSC,DUMMY(1),1*2)
       GO TO 10
 
    20 IF (JTREM.EQ.0 .OR. JTREM.EQ.4 ) THEN
-         CALL BUFIN (IFILE,IEOFSC,S(NLOW),NNB)
+         CALL BUFIN_sgl (IFILE,IEOFSC,S(NLOW),NNB*2)
          DO 30 I = NLOW, NNI
             SI = S(I)
             S(I) = 1.
@@ -1949,9 +1955,9 @@ CONTAINS !=====================Module Contians==========================
    30    CONTINUE
       ELSE
 
-         IF (IDUM2.EQ.1) CALL BUFIN (IFILE,IEOFSC,DUMMY(1),1)
-         CALL BUFIN (IFILE,IEOFSC,S(NLOW),NNB)
-         IF (IDUM1.EQ.1) CALL BUFIN (IFILE,IEOFSC,DUMMY(1),1)
+         IF (IDUM2.EQ.1) CALL BUFIN_sgl (IFILE,IEOFSC,DUMMY(1),1*2)
+         CALL BUFIN_sgl (IFILE,IEOFSC,S(NLOW),NNB*2)
+         IF (IDUM1.EQ.1) CALL BUFIN_sgl (IFILE,IEOFSC,DUMMY(1),1*2)
       ENDIF
 
 !PRT  WRITE(IPR,910) VMIN,VMAX,DVI,NLOW,NNI
