@@ -1740,7 +1740,7 @@ endif
          ! Isotope number for this line, 3rd digit from right of MFULL
          ISO = MOD(MOL(I),I_1000)/100
          if (iso.eq.0) iso=10
-         
+
          !--- Check if this line is from a selected molecule and when
          ! both line data and xs data are available if this line prefer xs over line,
          ! if so, skip this line.
@@ -1888,13 +1888,6 @@ endif
          ZETDIF = FZETA - REAL(IZ-1)
 
          ALFV = (AVRAT(IZ)+ZETDIF*(AVRAT(IZ+1)-AVRAT(IZ)))*(ALFL+ALFAD)
-         !print *, ' '
-         !print *, 'frequency', vnu(i)
-         !print *, 'pressure', pave
-         !print *, 'narrow width', narrowWidth, 'alfv', alfv
-         !print *, 'HWHMSI', hwhmsi
-         !print *, 'alfl', alfl
-         !print *, 'doppler broadening ALFAD', ALFAD
 
          IF (ALFV.LT.DV) THEN
             ALFV = DV

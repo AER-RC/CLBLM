@@ -1045,14 +1045,8 @@ CONTAINS !=================== Module Contains ==========================
      &              shrunk%alfa(ij) = shrunk%alfa(ij) + rhoslf(m)*(hwhmsi-alfa0i)
             end if
 
-!print *, 'speciesBroad', speciesBroad
-!print *, 'brd_mol_flg(m,i)', bufr%brd_mol_flg(m,i)
-!print *, 'narrow width', narrowWidth
-!print *, 'checkNarrowLine', checkNarrowLine
-
 ! mji - Revise code to skip broadening for incoming lines with flag = -1
 !      if(ibrd.gt.0) then
-! bb - I think ibrd in LBL is speciesBroad in clblm?
       if(speciesBroad) then
          if (bufr%brd_mol_flg(m,i).eq.-1) then
             shrunk%alfa(ij) = hwhmsi
@@ -1065,7 +1059,6 @@ CONTAINS !=================== Module Contains ==========================
             !--- For double convolution, pick out the narrow lines and
             ! save them into a scratch file for later use.
             if (checkNarrowLine) then
-               print *, 'checking narrow line'
                stop
 
                ALFL  = SHRUNK%ALFA(IJ)

@@ -467,8 +467,6 @@ CONTAINS  !===================== Module Contains =======================
       elseif (sfcPropMode==2) then; scene%sfc%ThmReflMode = 0;  !Lambertian thermal reflection
       endif
 
-      print *, 'sfcPropMode', sfcPropMode
-      print *, 'ThmReflMode', scene%sfc%ThmReflMode
 
       !--- Isotopologue are input as fractions. Convert to number density.
       ! Whenever a molecule has isotopologule fractions input, fractions for
@@ -954,11 +952,9 @@ CONTAINS  !===================== Module Contains =======================
       endif
 
 
-      print *,'zRT', zRT
-      print *,'pRTsize', pRTsize
+
       !--- Calculate generic RT grid in (Km)
       if (pRTsize>0) then
-         print *,'Calculate generic RT grid in (Km)'
          zRTsize = pRTsize
          allocate( zRT(zRTsize) )
          call InterpPressToAlt( zRT(1:zRTsize), & !out
@@ -1276,7 +1272,6 @@ CONTAINS  !===================== Module Contains =======================
       !---
       ! * Please be noted that sfcRad%indV1 = 1
       if ( present(sfcRad) .and. present(sfcEmis) ) then
-      print *,'returns sfc rad and emis from calcSurfThmEmis_spect in clblm_scene'
          allocate(sRad(NLIM))
          allocate(sEmis(NLIM))
 
@@ -1382,8 +1377,6 @@ CONTAINS  !===================== Module Contains =======================
                V=V1PO+ REAL(J-1)*DVPO
                BB = planck(V,XKTBND)
                sRad(J) = BB*EMISIV
-               !print *,'sRad(J)', sRad(J)
-               !print *,'emisiv', emisiv
                sEmis(J) = EMISIV
                EMISIV = EMISIV+EMDEL
             ENDDO
@@ -1515,7 +1508,6 @@ CONTAINS  !===================== Module Contains =======================
       elseif (surf%nsf==1) then !--- Emissivity input as a constant value
 
          A = surf%surfEm(1)
-         print *,'constant emis from emisfn in clblm_scene', A
          B = 0. !surf%surfEm(2)
          C = 0. !surf%surfEm(3)
 

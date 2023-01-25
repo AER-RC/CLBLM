@@ -556,27 +556,20 @@ CONTAINS !=================== MODULE CONTAINS ==========================
 
          tempGeom = scene%geom
 
-         print *, 'path flux_flag', flux_flags%flux_flag
 
-         print *, 'ThmReflMode', scene%sfc%ThmReflMode
 
          if ( scene%sfc%ThmReflMode == 1) then !specular reflection
-            print *, 'Specular Reflection in calcCLBLMPaths'
-            print *, 'Specular PHI', path%geom%PHI
+
             tempGeom%obs%obsAlt  = path%geom%Hend
             tempGeom%obs%viewAng = path%geom%PHI
             call calculatePath( downPath, scene%prfl, tempGeom, pathCtrl, path%zRT,path%nRTlev )
 
          elseif ( scene%sfc%ThmReflMode ==0) then !Lambertian reflection, use diffusivity angle
-            print *, 'Lambertian Reflection in calcCLBLMPaths'
-            print *, 'secant_diffuse', secant_diffuse
-            print *, 'Lambertian PHI', path%geom%PHI
+
             tempGeom%obs%obsAlt  = path%geom%Hend
             if (flux_flags%flux_flag .eqv. .false.) then
-               print*, 'use secant of diffusivity angle for path'
                tempGeom%obs%viewAng = acos(1./secant_diffuse)*180./PI
             elseif (flux_flags%flux_flag .eqv. .true.) then
-               print*, 'use vertical path'
                tempGeom%obs%viewAng = path%geom%PHI
             endif
             call calculatePath( downPath, scene%prfl, tempGeom, pathCtrl, path%zRT,path%nRTlev )

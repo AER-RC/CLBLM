@@ -138,7 +138,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
 
 
    flux_flag = flux_flags%flux_flag
-   print *,'driver flux flag', flux_flag
    ODonly = Rad==0.and.Tx==0.and.OD/=0
 
    NLTE_flag = .FALSE.
@@ -232,9 +231,7 @@ CONTAINS !======================  MODULE CONTAINS ======================
    else
       if (DV>0.) then !Uer user provided DV
          gridType = 1 !Uniform DV of user input value
- print *, 'uniform dv of user input value'
          CALL setDV( spectGrid, paths%view, DV_flags, gridType, V1,V2, DV )
- print *, 'DV', DV
       else
          gridType = 0 !Fixed ratio DV
          CALL setDV( spectGrid, paths%view, DV_flags, gridType, V1,V2 )
@@ -291,14 +288,12 @@ CONTAINS !======================  MODULE CONTAINS ======================
    outCtrl%Rad = Rad
    outCtrl%Tx  = Tx
    outCtrl%OD  = OD
- print *, 'Rad', Rad
    didPreBox = .FALSE.
    if (present(postProc_flags)) postCtrl = postProc_flags
 
    ! If running a radiative flux calculation, we will run the RT subroutine for the
    ! downwelling fluxes (Mode 1) and then upwelling fluxes (Mode 2)
    if (flux_flag .eqv. .true.) then
-      print *, 'flux case'
          CALL mode1_lookDn_mergeDn( outCtrl, RT_flags, Flux_flags, input_scene,& !RT_flags, &
                                     paths, surf, solRadTOA, &
                                     OD_flags, spectGrid, DV_flags, &
@@ -311,7 +306,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
                                     flxu, SfcRad, totRad, ODarray, &
                                     NLTE_flag, postCtrl, didPreBox )
    elseIF  ( upLook ) then !Up looking cases    !if ( all(path%IPATH) ==3 )
-  print *, 'up looking case'
 
       CALL mode3_lookUp_mergeUp( outCtrl, RT_flags, & !RT_flags, &
                                  paths%view, paths%obsLev, solRadTOA, &
@@ -322,7 +316,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
    ELSEIF ( dnLook ) then
 
       if (Tx==0) then !Down-looking, request radiance. Mode2 doesn't have transmittance output.
-  print *, 'down looking case, merge up'
          CALL mode2_lookDn_mergeUp( outCtrl, RT_flags, Flux_flags, & !RT_flags, &
                                     paths, surf, solRadTOA, &
                                     OD_flags, spectGrid, DV_flags, &
@@ -330,7 +323,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
                                     NLTE_flag, postCtrl, didPreBox )
 
       else !Down-looking, request radiance and total transmittance or transmittance profile
-  print *, 'down looking case, merge down'
          CALL mode1_lookDn_mergeDn( outCtrl, RT_flags, Flux_flags, input_scene, & !RT_flags, &
                                     paths, surf, solRadTOA, &
                                     OD_flags, spectGrid, DV_flags, flxd, &
@@ -410,9 +402,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
    endif
    if (present(nSampTx))  nSampTx = size(Txout,1)
 
-   !print *,'postproc flag functID', postProc_flags%functID
-   !print *,'read filter function path', ioFiles%filterFunctPath
-   !print *,'read filter function file', ioFiles%filterFunctFile
    !--- Copy radiance to output array
    if (present(RadOut) .and. Rad/=0) then
       if (Rad>0 .or. postProc_flags%functID /=0) then !scanning
@@ -428,10 +417,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
    !--- Copy flux to output array !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
    if (present(flxuOut) .and. flux_flag .eqv. .true.) then
       dv_flux = flux_flags%dv_flux
-      print *, 'P', input_scene%prfl%P
-      print *, 'nlev', input_scene%prfl%nlev
-
-      !print *,'sfc flux', SfcFlx
       OUT = (V2 - V1)/(DV_flux)
       NOUT = INT (OUT + EPS)
       allocate (flxuOut(input_scene%prfl%nlev,nout+1))
@@ -454,9 +439,7 @@ CONTAINS !======================  MODULE CONTAINS ======================
       do is=1,input_scene%prfl%nlev
          preslv(is)=input_scene%prfl%P(is)
       enddo
-      print *,'level', level
-      !flxdOut = flxd
-      ! print *,'flxdOut', flxdOut
+
       OUT = (V2 - V1)/(DV_flux)
       NOUT = INT (OUT + EPS)
       allocate (flux_bound(nout))
@@ -484,7 +467,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
          enddo
       enddo
 
-         print *,'write fluxes'
          dim1Name='levels'
          dim2Name='fluxSpectralBins'
          var1Name='upwellingFluxes'
@@ -526,8 +508,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
          if (Rad<0 .and. postProc_flags%functID==0) then !Filtered result
             call writeRadiance( fileHdr, Rad, filtOut=filtOut_rad )
          elseif (Rad/=0) then !mono or scanned result
- print *, 'write Radiance mono or scanned'
- print *, 'Rad', Rad
             call writeRadiance( fileHdr, Rad, totRad )
          endif
       endif
@@ -2216,8 +2196,6 @@ END SUBROUTINE
 
             dim1 = size(dataOut,1)
             dim2 = size(dataOut,2)
-            print *,'dim1', dim1
-            print *,'dim2', dim2
             call checkNetCDFcall(nf90_def_dim( ncid, dimName(1), dim1, dim1ID))
             call checkNetCDFcall(nf90_def_dim( ncid, dimName(2), dim2, dim2ID))
             call checkNetCDFcall(nf90_def_var( ncid, varName(1), NF90_DOUBLE, [dim1ID,dim2ID], varID))

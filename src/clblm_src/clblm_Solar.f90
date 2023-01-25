@@ -376,8 +376,6 @@ CONTAINS !===================== MODULE CONTAIS =========================
 
       !--- Read solar data in between requested V1 and V2
       !
-      print *,'V1', V1
-      print *,'V1all', V1
       if ( V1<V1all .or. V1>V2all ) STOP '---'//routineName//'(): Requested V1 is out of data range.'
       if ( V2<V1all .or. V2>V2all ) STOP '---'//routineName//'(): Requested V2 is out of data range.'
 

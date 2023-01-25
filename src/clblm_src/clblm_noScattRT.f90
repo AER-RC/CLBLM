@@ -150,10 +150,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
       flux_flag = fluxCtrl%flux_flag
       nang = fluxCtrl%nang
       DV_flux = fluxCtrl%DV_flux
-      print *,'DV flux',DV_flux
-      print *, 'nang', nang
-      print *, 'flux_flag', flux_flag
-
       scalODfac=1.0
 
       ! Assign secants of the quadrature angles based on cosine values from Radsum (Clough et al. 1992 Table 2)
@@ -173,7 +169,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
          secants(2)=1.0/0.59053314
          secants(3)=1.0/0.21234054
       endif
-      print *,'secants', secants
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
       ThermalOn = rtCtrl%ThermalOn
@@ -188,8 +183,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
 
 
       ODonly = (outCtrl%Rad==0 .and. outCtrl%Tx==0 .and. outCtrl%OD/=0)
-
-      print *, 'mode 1 look down merge down'
       !--- Find layout of IPATH
       !call findHiLoLayers( path%IPATH, lyrLo, lyrHi, nLayers, nLyr2 )
       lyrLo = 1
@@ -202,15 +195,9 @@ CONTAINS !======================  MODULE CONTAINS ======================
       initNLIM = 2 !ceiling( (spectGrid%V2 - spectGrid%V1) / spectGrid%DV(lyrHi) + 1. )
 
       !Check consistency of input for flux calc.  NOUT is number of output groups.
-      print *, 'V1', v1
-      print *, 'V2', v2
       OUT = (V2 - V1)/(DV_flux)
       NOUT = INT (OUT + EPS)
-      print *, 'nout', nout
       IF (ABS(FLOAT(NOUT)-OUT) .GT. EPS) THEN
-         print *,'V1 = ', V1
-         print *,'V2 = ', V2
-         print *,'DV_flux = ', DV_flux
          STOP 'V1, V2, (OUT DV)/(IN DV)  ARE INCONSISTENT'
       ENDIF
 
@@ -246,7 +233,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
          call CLBLM_Spectrum_init( mrgRadDn, V1,(V2-V1),initNLIM )
          mrgTxA%spect(:) =1.
          mrgRadUp%spect(:) =0.
-         print *, 'initialized mrgRadDn dv', mrgRadDn%dv
          mrgRadDn%spect(:) =0.
 
       elseif (SolarOn) then
@@ -271,7 +257,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
       do il = lyrHi, lyrLo, -1
 
          lyrNo = il
-         print *, '*loop over levels, layer number', il
          belowObs = (lyrNo < obsLevel)
 
          !--- Load layer temperature, pressure and concentration ...
@@ -290,11 +275,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
          if (scalThermalPath) scalUpFac    = upPath%Wtot(lyrNo)   / refLayer%Wtot
          if (scalThermalPath) scalDownFac  = downPath%Wtot(lyrNo) / refLayer%Wtot
          if (scalSolarPath)   scalSolarFac = solPath%Wtot(lyrNo)  / refLayer%Wtot
-
-         !print *,'scalThermalPath', scalThermalPath
-         !print *,'ThermalON', ThermalON
-         !print *,'ScalUpfac', ScalUpfac
-         !print *, 'ScalDownFac', ScalDownFac
          ! Setup flux calculation !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
          ! reset theses flux counters for each level
          ISTART = 1
@@ -311,30 +291,20 @@ CONTAINS !======================  MODULE CONTAINS ======================
          ENDDO
          BOUND(NOUT+1) = V2
 
-         ! Inside the loop over the layers we will have an if statement for the flux calculation
          IF (flux_flag .eqv. .true.) then
             IOUT = 1
             !loop over the angles
 
             DO iAng = 1, NANG
-               !print *,'*Loop over the angles', iang
                !scalODfac will be used in the subroutine layerMerge_mode to scale the OD by the secant of the quadrature angle
                scalODfac=secants(iAng)
 
-               !print *,'scalODfac', scalODfac
-
-               ! the variable mrgRadUp is both the input radiance, and after modification in the code,
-               !the output radiance.  I would think that it's meant to be iteratively modified along
-               ! the vertical path.  but now we're calling it multiple times for each layer, once per angle.
-               ! therefore it gets iteratively modified 3 times per layer.  if this is correct, then adding an angle
-               ! variable to this in the calling routine should get rid of this issue.
                IF (il .LT. lyrHi) then
                   ! set the incoming radiance to the radiance at the given quadrature angle
                   mrgRadDn%spect(:)=RADD(:,iAng)
                   mrgRadUp%spect(:)=RADU(:,iAng)
                   mrgTxA%spect(:)=TxA(:,iAng)
                ENDIF
-               print *,'*Call layerMerge_mode to calculate the radiances'
                call layerMerge_mode1( refLayer, upLayer, downLayer, solLayer, &
                                 odCtrl, spectGrid, dvCtrl, &
                                 ODonly, ThermalOn, SolarOn, &
@@ -342,14 +312,11 @@ CONTAINS !======================  MODULE CONTAINS ======================
                                 scalUpFac, scalDownFac, scalSolarFac, &
                                 linInTau, NLTE, belowObs, &
                                 mrgTxA, mrgRadUp, mrgRadDn, solMrgTx, lyrOD, scalODfac )
-               print *, 'mrgRadDn', mrgRadDn%dv, mrgRadDn%nlim
                ! Assign some variables for flux calculations !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                IF (il .EQ. lyrHi .and. iAng .EQ. 1) then
                   ! factor is used to multiply radiance in W/cm2 ster to obtain fluxes in W/m2.
                   FACTOR = mrgRadDn%DV * 1.E04 * 2. * PI
-                  print *, 'mrgRadDn%dv', mrgRadDn%dv
                   outinrat=dv_flux/mrgRadDn%dv
-                  print *, 'outinrat', outinrat
                   ! Rad stores radiances for each angle, same spectral resolution as the radiances
                   allocate (radd(mrgRadDn%nlim,nang))
                   radd(:,:)=0.0
@@ -369,25 +336,22 @@ CONTAINS !======================  MODULE CONTAINS ======================
                RADU(:,iAng)=mrgRadUp%spect(:)
                TxA(:,iAng)=mrgTxA%spect(:)
 
-               ! I think I need to keep track of the mrgRadDn structure, not just radiances,
+               ! keep track of the mrgRadDn structure, not just radiances,
                ! for the surface term from subroutine addThermalBoundary
                if (iAng .EQ. 1) then
                   mergeRadDn1=mrgRadDn
                   mergeRadUp1=mrgRadUp
                   mergeTxA1=mrgTxA
-                  !  print *,'mergeRadDn1', mergeRadDn1%spect(1)
                endif
                if (iAng .EQ. 2) then
                   mergeRadDn2=mrgRadDn
                   mergeRadUp2=mrgRadUp
                   mergeTxA2=mrgTxA
-                  !  print *,'mergeRadDn2', mergeRadDn2%spect(1)
                endif
                if (iAng .EQ. 3) then
                   mergeRadDn3=mrgRadDn
                   mergeRadUp3=mrgRadUp
                   mergeTxA3=mrgTxA
-                  !  print *,'mergeRadDn3', mergeRadDn3%spect(1)
                endif
 
                !Before adding the radiances from the lowest downwelling layer they must be multiplied
@@ -397,7 +361,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
                if (il .EQ. lyrLo) then
                   ! SfcRadd stores surface radiances for each angle, same spectral resolution as the radiances
                   if (iAng .EQ. 1) then
-                     print *,'flux_flag', flux_flag
                      call addThermalBoundary( thmRadUp, surf, mergeTxA1, mergeRadUp1, mergeRadDn1,fluxCtrl)
                      ! Keep track of the surface radiance at this angle
                      SfcRadd(:,iAng)=thmRadUp%spect(:)
@@ -416,12 +379,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
 
             ENDDO !ends loop over angles for radiance calculation at the given level
 
-            print *, '*add up radiances in the spectral bin requested by the user for fluxes'
-            !print *,'iout', iOut
-            !print *,'istart', istart
-            !print *,'initNLIM', initNLIM
-            !print *,'icount', icount
-
             !     Keep a running total of radiances in each desired output group.
             DO K = ISTART, mrgRadDn%nlim
                !  kk = kk + 1
@@ -433,7 +390,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
                   !           Current output group is complete.
                   ICOUNT = 0
                   IOUT = IOUT + 1
-                  !print *,'iout', iout
                   !    kk = 0
                ENDIF
                ! Save surface downwelling fluxes on the grid the radiances come in on.
@@ -453,8 +409,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
             !     calculate fluxes.
             ! QUADRATURE METHOD: First-order
             !     NDL = NLEV - ILEV
-            !     print *,'il', IL
-            print *, '*perform flux calculation'
             DO L = 1, NOUT
                IF (NANG .EQ. 1) THEN
                   FLXTTD(IL,L) = GWGO1 * SRADD(L,1) * FACTOR
@@ -466,7 +420,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
                STOP ' ERROR IN NANG '
                ENDIF
             ENDDO ! ends flux calculation loop over output groups
-            !    print *, 'il', il
 
          ENDIF ! ends flux calculation for a given level
 
@@ -531,14 +484,13 @@ CONTAINS !======================  MODULE CONTAINS ======================
          !     downwelling surface flux times the reflectivity.
          call surfThmEmis( surf, V1,mrgRadDn%dv,mrgRadDn%nlim, &
          surfRad, surfEmis )
-         !print *,'nlim surf', surfRad%nlim
          ICOUNT = 0
          ISTART=1
          IOUT=1
          DO K = ISTART, mrgRadDn%nlim-1
-         !test the flux calculation with a Lambertian option. To do so you should initialize
-         !the upwelling radiances at each of the three angles with the surface upwelling FLUX divided by PI,
-         !which would convert it to radiance, then just run the upwelling calculation as before.
+         !For Lambertian option, initialize the upwelling radiances at each of the three angles
+         ! with the surface upwelling FLUX divided by PI, which would convert it to radiance
+         ! then run the upwelling calculation as before.
               if (input_scene%sfc%ThmReflMode == 0) then !lambertian reflection
                  SfcRadd(k,:)=surfRad%spect(k) + ((1.-surfEmis%spect(k)) * (dfluxdv(k)/(PI*mrgRadDn%DV*1.E04)))
               endif
@@ -546,7 +498,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
             ICOUNT = ICOUNT + 1
             IF (ICOUNT .GE. OUTINRAT) THEN
                !           Current output group is complete.
-               !   print *, 'current output group is complete k', k
                ICOUNT = 0
                IOUT = IOUT + 1
             endif
@@ -554,7 +505,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
       endif
       !---Output Flux
       flxttdOut = flxttd
-      ! print *,'SfcRadd', SfcRadd(1,1)
       !--- Add surface surface emission and reflected solar beam radiation
       !
       if (outCtrl%Rad/=0) then
@@ -666,9 +616,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
 
             ! For flux calculations, scale the optical depth by secant of the quadrature angle
             ! Otherwise scalODfac=1
-            !print *,'scale OD by secant of quadrature angle', scalODfac
-            !Check to make sure the OD that is scaled is not changing for each angle.
-            ! print *,'lyrODA%spect(indV1)', lyrODA%spect(lyrODA%indV1)
             do iv = lyrODA%indV1, lyrODA%indV2
                lyrODA%spect(iv) = lyrODA%spect(iv) * scalODfac
             enddo
@@ -702,7 +649,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
 
             ! For flux calculations, scale the optical depth by secant of the quadrature angle "scalODfac"
             ! Otherwise scalODfac=1
-            !print *,'scale OD for downwelling path'
             do iv = lyrODB%indV1, lyrODB%indV2
                lyrODB%spect(iv) = lyrODB%spect(iv) * scalODfac
             enddo
@@ -1023,7 +969,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
          if (ThermalOn) then
 
             !--- Downwelling thermal emission
-            print *, 'call layerEmis', il
             call layerEmis( lyrEmDn, aLayer%Tbot, aLayer%Ttop, aLayer%Tave,&
                                      lyrTx, lyrOD, linInTau, &
                                      NLTE, nlteEmisFac )
@@ -1035,8 +980,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
             call interpToFinestGrid( mrgTx, mrgRadDn, lyrEmDn )
 
             do iv = mrgRadDn%indV1, mrgRadDn%indV2
-            !print *, 'iv', iv
-            !print *, 'mrgRadDn%spect(iv)', mrgRadDn%spect(iv)
                mrgRadDn%spect(iv) = mrgRadDn%spect(iv) + &
                                     lyrEmDn%spect(iv) * mrgTx%spect(iv)
             enddo
@@ -1048,7 +991,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
          !
          if (.not.ODonly) then
             !call interpSpectrum( mrgTx, lyrTx%DV,lyrTx%V1,lyrTx%NLIM)
-            ! print *, 'merge transmittance in noScattRT'
             call interpToFinestGrid( mrgTx, lyrTx )
 
             do iv = mrgTx%indV1, mrgTx%indV2
@@ -1076,7 +1018,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
       !--- Final merge
       !
       if (ThermalOn .and. SolarOn) then
-         print *, 'Final Merge thermal and solar on in noScattRT'
          totalRadDn = mrgRadDn
 
          !call interpSpectrum( solRadTOA, mrgTx%DV, mrgTx%V1, mrgTx%NLIM )
@@ -1108,12 +1049,9 @@ CONTAINS !======================  MODULE CONTAINS ======================
 
       !--- Regrid Tx to uniform grid and do prebox smoothing if needed
       !
-      print *,'TxArray%DV', TxArray%DV
       if (outCtrl%Tx /=0) then
          l1 = lbound(TxArray,1)
          l2 = ubound(TxArray,1)
-         print *,'l1', l1
-         print *,'l2', l2
          Lmin  = minloc( [(TxArray(i)%DV, i=l1,l2)], 1 )
          V1B = TxArray(Lmin)%V1
          V2B = TxArray(Lmin)%V2
@@ -1124,7 +1062,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
          V2B = totalRadDn%V2
          DVB = totalRadDn%DV
          DVmin = DVB
-         print *,'DVB in noScattRT',DVB
       endif
 
       doPreBox = .FALSE.
@@ -1291,14 +1228,10 @@ CONTAINS !======================  MODULE CONTAINS ======================
       scalSolarPath   = paths%AMScalingSolar
       refPath         = paths%refPath
 
-      print *, 'mode 2 look down merge up'
       ! Inputs for flux calculations !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       flux_flag = fluxCtrl%flux_flag
       nang = fluxCtrl%nang
       DV_flux = fluxCtrl%DV_flux
-      print *,'DV flux',DV_flux
-      !print *, 'nang', nang
-      print *, 'flux_flag', flux_flag
 
       scalODfac=1.0
 
@@ -1319,13 +1252,11 @@ CONTAINS !======================  MODULE CONTAINS ======================
          secants(2)=1.0/0.59053314
          secants(3)=1.0/0.21234054
       endif
-      !print *,'secants', secants
 
       ThermalOn = rtCtrl%ThermalOn
       SolarOn   = rtCtrl%SolarOn
       linInTau  = rtCtrl%linInTau
 
-      print *,'linInTau', linInTau
       if (outCtrl%Rad==0 .and. outCtrl%Tx==0 .and. outCtrl%OD==0) &
          STOP '--- '//routineName//'(): No output requested.'
 
@@ -1347,15 +1278,11 @@ CONTAINS !======================  MODULE CONTAINS ======================
       V2 = spectGrid%V2
       DV = spectGrid%DVnormal(lyrLo)
 
-      print *, 'DV from DVnormal', DV
-
       if (flux_flag .eqv. .true.) then
          DV = spectGrid%DVout
-         print *, 'DV from DVout', DV
       endif
 
       initNLIM = ceiling( (V2-V1)/DV + 1. )
-      print *, 'initNLIM', initNLIM
 
       if ( ThermalOn ) then
          call surfThmEmis( surf, V1,DV,initNLIM, &
@@ -1366,7 +1293,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
          if (flux_flag .eqv. .true.) then
             thmRefl%spect(:) = 0.0
          endif
-         print *, 'thmRefl', thmRefl%spect(1)
       endif
 
       if (SolarOn) then
@@ -1380,7 +1306,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
          solMrgRefl = solRefl
          elseif (ThermalOn) then
             mrgRadUp = surfRad
-            print *, 'do surfThmEmis'
             mrgThmRefl = thmRefl
          elseif (SolarOn) then
             call CLBLM_Spectrum_init( mrgRadUp, V1,DV,initNLIM )
@@ -1390,17 +1315,10 @@ CONTAINS !======================  MODULE CONTAINS ======================
       endif
 
       !Check consistency of input for flux calc.  NOUT is number of output groups.
-      print *, 'V1', v1
-      print *, 'V2', v2
       if (flux_flag .eqv. .true.) then
          OUT = (V2 - V1)/(DV_flux)
          NOUT = INT (OUT + EPS)
-         print *, 'nout', nout
          IF (ABS(FLOAT(NOUT)-OUT) .GT. EPS) THEN
-            print *,'V1 = ', V1
-    	      print *,'V2 = ', V2
-            print *,'OUTINRAT = ', OUTINRAT
-            print *,'DV_flux = ', DV_flux
             STOP 'V1, V2, (OUT DV)/(IN DV)  ARE INCONSISTENT'
          endif
 	   ENDIF
@@ -1419,11 +1337,9 @@ CONTAINS !======================  MODULE CONTAINS ======================
       !--- Merging layers
       ! * Calculate total upwelling thermal radiance
       ! * Calculate merged solar reflectance
-      ! Betsy this is the loop over the layers
       do il = lyrLo,lyrHi
 
          lyrNo = il
-         print *, 'Layer number', il
 
          belowObs = (lyrNo < obsLevel)
 
@@ -1444,9 +1360,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
          if (scalThermalPath) scalDownFac  = downPath%Wtot(lyrNo) / refLayer%Wtot
          if (scalSolarPath)   scalSolarFac = solPath%Wtot(lyrNo)  / refLayer%Wtot
 
-         !print *,'scalThermalPath',scalThermalPath
-         !print *,'scalUpFac', scalUpFac
-         !print *,'scalDownFac', scalDownFac
          ! Setup flux calculation !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
          ! reset theses flux counters for each level
          ISTART = 1
@@ -1464,33 +1377,22 @@ CONTAINS !======================  MODULE CONTAINS ======================
          BOUND(NOUT+1) = V2
          endif
 
-         ! Inside the loop over the layers we will have an if statement for the flux calculation
          if (flux_flag .eqv. .true.) then
             IOUT = 1
             !loop over the angles
             do iAng = 1, NANG
-               !print *,'Angle', iAng
                !scalODfac will be used in the subroutine layerMerge_mode to scale the OD by the secant of the quadrature angle
                scalODfac=secants(iAng)
-               !print *,'scalODfac', scalODfac
 
                ! Initialize mrgRadup with downwelling surface radiances
                if (il .EQ. lyrlo) then
                   mrgRadUp%spect(:)=SfcRad(:,iAng)
-                  print *,'SfcRad at first wavenumber', SfcRad(1,iAng)
-                  print *,'initial mrg refl', mrgThmRefl%spect(1)
                endif
-               ! the variable mrgRadUp both the input radiance, and after modification in the code,
-               !the output radiance.  I would think that it's meant to be iteratively modified along
-               ! the vertical path.  but now we're calling it multiple times for each layer, once per angle.
-               ! therefore it gets iteratively modified 3 times per layer.  if this is correct, then adding an angle
-               ! variable to this in the calling routine should get rid of this issue.
                if (il .GT. 1) then
                   ! set the incoming radiance to the radiance at the given quadrature angle
                   mrgRadUp%spect(:)=RADU(:,iAng)
                   mrgThmRefl%spect(:)=thmref_ang(:,iAng)
                endif
-               !print *,'Call layerMerge_mode to calculate the radiances'
                call layerMerge_mode2( refLayer, upLayer, downLayer, solLayer, &
                                 odCtrl, spectGrid, dvCtrl, &
                                 ODonly, ThermalOn, SolarOn, &
@@ -1503,9 +1405,7 @@ CONTAINS !======================  MODULE CONTAINS ======================
                if (il .EQ. lyrLo .and. iAng .EQ. 1) then
                   ! factor is used to multiply radiance in W/cm2 ster to obtain fluxes in W/m2.
                   FACTOR = mrgRadUp%DV * 1.E04 * 2. * PI
-                  !print *, 'mrgRadUp%dv', mrgRadUp%dv
                   outinrat=dv_flux/mrgRadUp%dv
-                  !print *, 'outinrat', outinrat
                   ! Rad stores radiances for each angle, same spectral resolution as the radiances
                   allocate (radu(mrgRadUp%nlim,nang))
                   radu(:,:)=0.0
@@ -1513,21 +1413,12 @@ CONTAINS !======================  MODULE CONTAINS ======================
                   thmref_ang(:,:)=0.0
                endif ! ends allocating variables once the spectrum has been interpolated
 
-               !print *,'mrgRadUp dv from layerMerge', mrgRadUp%dv
-               !print *,'mrgRadUp NLIM from layerMerge', mrgRadUp%nlim
                ! Keep track of the radiance at this angle
                RADU(:,iAng)=mrgRadUp%spect(:)
                thmref_ang(:,iAng)=mrgThmRefl%spect(:)
-               !print *,'mrgRadUp%spect(3)', mrgRadUP%spect(3)
-               !print *,'RADU(3,I)', RADU(3,I)
 
             ENDDO !ends loop over angles for radiance calulation at the given level
 
-            !print *, '*add up radiances in the spectral bin requested by the user for fluxes'
-            !print *,'iout', iOut
-            !print *,'istart', istart
-            !print *,'initNLIM', initNLIM
-            !print *,'icount', icount
             !     Keep a running total of radiances in each desired output group.
             DO K = ISTART, mrgRadUp%nlim
                !  kk = kk + 1
@@ -1539,15 +1430,12 @@ CONTAINS !======================  MODULE CONTAINS ======================
                   !           Current output group is complete.
                   ICOUNT = 0
                   IOUT = IOUT + 1
-                  !print *,'iout', iout
                   !    kk = 0
                ENDIF
             enddo ! ends K loop over the spectral range for adding the radiances
 
             ! All needed radiances have been summed for this level.  Time to
             !     calculate fluxes.
-            !     print *,'il', IL
-            !print *, '*perform flux calculation'
             DO L = 1, NOUT
                IF (NANG .EQ. 1) THEN
                   FLXTTU(IL,L) = GWGO1 * SRADU(L,1) * FACTOR
@@ -1559,8 +1447,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
                   STOP ' ERROR IN NANG '
                ENDIF
             enddo ! ends flux calculation loop over output groups
-            !     print *, 'il', il
-            !     print *, 'FLXTTU(il,1)', FLXTTU(il,1)
          endif ! ends if statement for flux calculation at this level
 
          scalODfac=1.0
@@ -1571,9 +1457,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
                                 scalUpFac, scalDownFac, scalSolarFac, &
                                 linInTau, NLTE, belowObs, &
                                 mrgRadUp, mrgThmRefl, solMrgRefl, lyrOD, scalODfac )
-
-         !print *, 'mrgRadUp%spect(1)', mrgRadUp%spect(1)
-         !flxttuOut(il,:) = mrgRadUp%spect(:)
 
          !---Output OD
          if (outCtrl%OD/=0 .and. belowObs) then
@@ -1754,17 +1637,12 @@ CONTAINS !======================  MODULE CONTAINS ======================
             call CLBLM_Spectrum_init( lyrODA, refPathOD%V1, &
                                               refPathOD%DV, &
                                               refPathOD%NLIM )
-            !print *, 'scalUpFac', scalUpFac
             do iv = lyrODA%indV1, lyrODA%indV2
                lyrODA%spect(iv) = refPathOD%spect(iv) * scalUpFac
-               !print *,'scalThermalPath'
             enddo
 
             ! For flux calculations, scale the optical depth by secant of the quadrature angle
             ! Otherwise scalODfac=1
-            !print *,'scale OD by secant of quadrature angle', scalODfac
-            !Check to make sure the OD that is scaled is not changing for each angle.
-            ! print *,'lyrODA%spect(indV1)', lyrODA%spect(lyrODA%indV1)
             do iv = lyrODA%indV1, lyrODA%indV2
                lyrODA%spect(iv) = lyrODA%spect(iv) * scalODfac
             enddo
@@ -1795,13 +1673,11 @@ CONTAINS !======================  MODULE CONTAINS ======================
             call CLBLM_Spectrum_init( lyrODB, refPathOD%V1, &
                                               refPathOD%DV, &
                                               refPathOD%NLIM )
-            !print *,'scalDownFac', scalDownFac
             do iv = lyrODB%indV1, lyrODB%indV2
                lyrODB%spect(iv) = refPathOD%spect(iv) * scalDownFac
             enddo
             ! For flux calculations, scale the optical depth by secant of the quadrature angle
             ! Otherwise scalODfac=1
-            !print *,'scale OD for downwelling path'
             do iv = lyrODB%indV1, lyrODB%indV2
                lyrODB%spect(iv) = lyrODB%spect(iv) * scalODfac
             enddo
@@ -1918,7 +1794,7 @@ CONTAINS !======================  MODULE CONTAINS ======================
             enddo
 
          else !layer is above observer
-         print *,'layer is above observer'
+
             call interpToFinestGrid( mrgRadUp, mrgThmRefl, lyrTxB, lyrEmDn)
 
              !--- Merge downwelling radiance
@@ -2097,7 +1973,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
       logical                      :: flux_flag
 
       flux_flag = fluxCtrl%flux_flag
-      print *, 'flux_flag in addThermalBoundary', flux_flag
       mergeRefl = .FALSE.
       if (present(calcThmRefl)) mergeRefl = calcThmRefl
 
@@ -2114,7 +1989,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
          call interpToFinestGrid( atmTxA, atmRadUp, atmRadDn )
 
          !--- Get surface emission and thermal reflectance
-         print *,'call surfThmEmis in AddThermalBoundary'
          call surfThmEmis( surf, &
                            atmRadUp%V1,&
                            atmRadUp%DV,&
@@ -2134,7 +2008,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
                                    atmRadUp%V1, &
                                    atmRadUp%DV, &
                                    atmRadUp%NLIM )
-         print *, 'surface emission and reflection from AddThermalBoundary'
 
          IF (flux_flag .eqv. .false.) then
             do iv = 1, totRadUp%NLIM
@@ -2190,7 +2063,6 @@ CONTAINS !======================  MODULE CONTAINS ======================
                                    atmRadUp%V1, &
                                    atmRadUp%DV, &
                                    atmRadUp%NLIM )
-         print *,'emission only'
          do iv = 1,totRadUp%NLIM
             totRadUp%spect(iv) = atmRadUp%spect(iv) + &
                                  atmTxA%spect(iv)*surfRad%spect(iv)

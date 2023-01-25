@@ -993,7 +993,6 @@ CONTAINS !=================== MODULE CONTAINS ==========================
          if ( .NOT.( fluxCtrl%nang == 1 .or. &    !if =1 one quadrature angle
                   fluxCtrl%nang == 2 .or. &    !if =2 two quadrature angles
                   fluxCtrl%nang == 3 ) ) then  !if =3 three quadrature angles
-                     print *, 'fluxCtrl%nang', fluxCtrl%nang
          STOP '--- '//routineName//'(): Invalid value for number of quadrature angles.'//' Program stopped.'
          endif
       endif

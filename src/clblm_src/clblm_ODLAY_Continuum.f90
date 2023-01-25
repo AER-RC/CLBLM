@@ -375,7 +375,7 @@ CONTAINS !=====================Module Contains==========================
 
 !     Only calculate if V2 > -20. cm-1 and V1 <  20000. cm-1
 !
-      if ((V2.gt.-20.0).and.(V1.lt.20000.) .and. xself.gt.0.) then      
+      if ((V2.gt.-20.0).and.(V1.lt.20000.) .and. xself.gt.0.) then
          sh2ot0 = 0.
          sp = 0.
          !sh2ot1 = 0.
@@ -384,7 +384,6 @@ CONTAINS !=====================Module Contains==========================
 !         CALL SL260 (V1C,V2C,DVC,NPTC,SH2OT1,V1ABS,V2ABS,v1ss,v2ss)
 !     Get temperature exponent for SELF coefficient
          CALL SLP (V1C,V2C,DVC,NPTC,SP,V1ABS,V2ABS,v1ss,v2ss)
-         print *,'SLP'
 !
 !           Loop calculating self continuum optical depth
 !

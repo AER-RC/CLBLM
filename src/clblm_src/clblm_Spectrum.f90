@@ -404,13 +404,11 @@ CONTAINS !======================= MODULE CONTAINS ======================
 
       !--- Check to make sure the input range covers the output range at starting point
       if ( V1out < V1in ) then
-         print *,'V1in, V1out:', V1in, V1out
          STOP '--- '//routineName//'(): Output V1 can not be less than input V1.'
       endif
 
       !--- No more than 1 DV distance extrapolation will occur.
       if ( V2in + DVin < V2out ) then
-         print *,'V2in, V2out:', V2in, V2out
 
          ! STOP '--- '//routineName//'(): Output V2 can not exceed input V2 by more than one DVin'
       endif
@@ -768,7 +766,6 @@ CONTAINS !======================= MODULE CONTAINS ======================
       loc = minloc(spDV)
       locMinDV = loc(1)  !location of the spectrum with minimum DV
       DV_min   = spArray(locMinDV)%ptr%DV   !minimum DV
-      !print *, 'DV_min in Spectrum.f90', DV_min
       V1_min   = spArray(locMinDV)%ptr%V1
       NLIM_min = spArray(locMinDV)%ptr%NLIM
 
