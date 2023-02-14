@@ -67,6 +67,8 @@ CLBLM_SRC = $(CLBLM_DIR)/clblm_Config.f90 \
 	         $(CLBLM_DIR)/clblm_ODLAY_TIPS.f90 \
 	         $(CLBLM_DIR)/clblm_ODLAY_CommonSub.f90 \
 	         $(CLBLM_DIR)/clblm_ODLAY_XSect.f90 \
+			 $(CLBLM_DIR)/read_module.f90 \
+			 $(CLBLM_DIR)/mt_ckd_h2o_module.f90 \
 	         $(CLBLM_DIR)/clblm_ODLAY_Continuum.f90 \
 	         $(CLBLM_DIR)/clblm_ODLAY_LineF4.f90 \
 	         $(CLBLM_DIR)/clblm_ODLAY.f90 \
