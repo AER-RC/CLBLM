@@ -112,7 +112,7 @@ The `TAPE5` input file is read as formatted FORTRAN. As a consequence of the for
 *	Edit necessary parameters in the `TAPE5` input file.  Note that the beginning and ending wavenumber (_v<sub>1</sub>_, _v<sub>2</sub>_) in `TAPE5` must extend at least 25 cm<sup>-1</sup> beyond each end of the desired spectral range for the LBLRTM calculations.
 *	Run the LNFL executable.
 
-# Instructions and Tips for Compiling and Running LBLRTM <a name="runlbl"></a>
+# Instructions and Tips for Compiling and Running CLBLM <a name="runlbl"></a>
 
 CLBLM is used to generate line-by-line upwelling and downwelling transmittances and radiances.
 
@@ -180,7 +180,7 @@ The Analytical Jacobians can be output directly from CLBLM. Simply set "clblm_ou
 
 Yes. Sceen_writer is able to handle the scaling provided in the LBLRTM TAPE5.
 
-5. **Does LBLRTM include heavy molecule parameters (cross-sectional species)?**
+5. **Does CLBLM include heavy molecule parameters (cross-sectional species)?**
 
 Heavy molecules (such as CCL4, F11, and others) can be included in CLBLM calculations. Sceen_writer handles in the inclusion of cross-section molecules included in the LBLRTM TAPE5. An additional file (`FSCDXS`) and directory (`xs`) are required for these calculations and can be obtained from the [cross sections repository](https://github.com/AER-RC/cross-sections) (which is cloned with LBLRTM if the directions in the [Cloning][#cloning] section are followed) or from the CLBLM example tar file (available in the [CLBLM v1 Release](https://github.com/AER-RC/CLBLM/releases/download/v1/clblm_v1.examples.tar)).
 
