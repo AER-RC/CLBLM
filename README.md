@@ -140,7 +140,7 @@ The file specifies the dimensions of the output as the number of points in the m
 ```
 make all
 ``` 
-* Link the line parameter database (`TAPE3` from LNFL) to the CLBLM/clblm_data/spectroscopy directory.
+* Link the line parameter database (`TAPE3` from LNFL) to CLBLM/clblm_data/spectroscopy/TAPE3.
 * Use the sceenwriter executable to build the profile input from an existing LBLRTM TAPE5
 ```
 scene_writer TAPE5_user_defined_upwelling  user_archive/scene_files/scenes.nc
