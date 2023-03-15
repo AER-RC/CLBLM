@@ -207,7 +207,7 @@ Absorption due to clouds and aerosols is not available with the initial release 
 
 8. **Solar Radiance**
 
-Solar radiance calculations can be performed by utilizing a particular solar source function file `SOLAR.RAD.nc`. A `SOLAR.RAD.nc` file can be generated with the program `build_solar`. The AER solar source function is based on information from the NRLSSI2 model, allowing the user to account for solar variability. The solar source function is available is at a high spectral resolution (i.e. for monochromatic calculations) and 1 cm<sup>-1</sup>? resolution. See the CLBLM example package and instructions for more details.
+Solar radiance calculations can be performed by utilizing a particular solar source function file `SOLAR.RAD.nc`. The `SOLAR.RAD.nc` file can be generated with the program `build_solar`. The AER solar source function is based on information from the NRLSSI2 model, allowing the user to account for solar variability. The solar source function is available is at a high spectral resolution (i.e. for monochromatic calculations) and 1 cm<sup>-1</sup>? resolution. See the CLBLM example package and instructions for more details.
 
 9. **Line coupling/mixing**
 
