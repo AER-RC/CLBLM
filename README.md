@@ -122,7 +122,7 @@ CLBLM is used to generate line-by-line upwelling and downwelling transmittances 
 
 CLBLM does not have a limit for the spectral interval, unlike LBLRTM (runs must not exceed 2000 cm<sup>-1</sup>). 
 
-Other input files are required if you are using the solar source function, cross sections, surface emissivity, etc. See the CLBLM instruction manual and provide example.
+Other input files are required if you are using the solar source function, cross sections, surface emissivity, etc. See the CLBLM instruction manual and examples provided.
 
 ## Layer numbering scheme <a name="laynum"></a>
 
