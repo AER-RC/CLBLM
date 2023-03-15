@@ -177,8 +177,11 @@ Absorption/emission spectra are comprised of a complicated array of spectral lin
 
 3. **Radiance Derivatives (Jacobians)**
 
-CLBLM features a straighforward setup for Jacobians, in which Jacobians can be output directly from a single CLBLM run. In the clblm_config.json input file, set "clblm_out" to "jacobians" and specify which jacobians you want to run (ex. "jacobian-list": ["T","H2O","Tskin","emis"]) . See the CLBLM example package and instructions for more details.
-
+CLBLM features a straighforward setup for Jacobians, in which Jacobians can be output directly from a single CLBLM run. In the clblm_config.json input file, set clblm_out to jacobians and specify which jacobians you want to run. See the CLBLM example package and instructions for more details.
+```
+"clblm-out":                  {"convolved jacobians":"clblm_out/jacobian.nc","jacobian-list": ["T","H2O","Tskin","emis"]}
+```
+	
 4. **Is it possible to scale the profile of one or more species?**
 
 Yes. Sceen_writer is able to handle the scaling provided in the LBLRTM TAPE5.
