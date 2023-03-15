@@ -217,5 +217,8 @@ Line coupling parameters are utilized in LBLRTM for O<sub>2</sub>, CO<sub>2</sub
 
 11. **How do you calculate fluxes?**
 
-CLBLM features built-in flux calculations, such that radiative fluxes and heating rates can be output directly from a single CLBLM run. In the clblm_config.json input file, add a "flux-flags" group  and specify the flux parameters, such as the spectral interval for the flux output and the number of quadrature angles to use for the flux calculation (ex. {"flux_flag":true, "dv_flux":10.0,"nang":3}). See the CLBLM example package and instructions for more details.
+CLBLM features built-in flux calculations, such that radiative fluxes and heating rates can be output directly from a single CLBLM run. In the clblm_config.json input file, add the flux-flags group and specify the flux parameters, such as the spectral interval for the flux output and the number of quadrature angles to use for the flux calculation. See the CLBLM example package and instructions for more details.
+```
+"flux-flags":                  {"flux_flag":true, "dv_flux":10.0,"nang":3}
+```
 
