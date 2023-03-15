@@ -112,11 +112,11 @@ The `TAPE5` input file is read as formatted FORTRAN. As a consequence of the for
 *	Edit necessary parameters in the `TAPE5` input file.  Note that the beginning and ending wavenumber (_v<sub>1</sub>_, _v<sub>2</sub>_) in `TAPE5` must extend at least 25 cm<sup>-1</sup> beyond each end of the desired spectral range for the LBLRTM calculations.
 *	Run the LNFL executable.
 
-# Instructions and Tips for Compiling and Running CLBLM <a name="runlbl"></a>
+# Instructions and Tips for Compiling and Running CLBLM <a name="runclblm"></a>
 
 CLBLM is used to generate line-by-line upwelling and downwelling transmittances and radiances.
 
-## Required input files for CLBLM <a name="lblin"></a>
+## Required input files for CLBLM <a name="clblmin"></a>
 1. `scenes.nc`: NetCDF file containing profile information (ex. temperature, pressure, molecular amounts, etc.) required to run CLBLM.
 2. `clblm_config.json`: JSON control file with model run parameters (ex. requested output, spectral inverval, instrument functions, etc.) , required to run CLBLM.
 
@@ -128,25 +128,28 @@ Other input files are required if you are using the solar source function, cross
 
 The CLBLM convention is that layer 1 is at the highest pressure level (lowest altitude).  The layer information for a given run may be found in the scenes.nc input file.
 
-## Output files for CLBLM <a name="lblout"></a>
+## Output files for CLBLM <a name="clblmout"></a>
 The CLBLM output is a netCDF file containing the desired output (ex. transmittances/radiances).
 
 The file specifies the dimensions of the output as the number of points in the model run (`numPoints`) and for some runs, the number of vertical levels (`numLayers`). The global attributes include the (`spectralDataType`) such as "monochromatic" or "convolved", the starting and ending points of the model run (_v<sub>1</sub>_ and _v<sub>2</sub>_), and the spectral spacing of the points (`dv`). 
 
 
-## Sequence for running CLBLM <a name="lblseq"></a>
+## Sequence for running CLBLM <a name="clblmseq"></a>
 * [Clone the latest CLBLM code](https://github.com/AER-RC/CLBLM#cloning-the-latest-release-) and download the latest line parameter database with the [AER Line File repository](https://github.com/AER-RC/AER_Line_File) or from [Zenodo](https://zenodo.org/record/4019178).
-* Compile LBLRTM following makefiles in the LBLRTM tar file. Note, one needs to compile in the `build` directory
+* Compile CLBLM, scene_writer, and build_solar with the makefile in the CLBLM tar file.
+```
+make all
+``` 
 * Link the line parameter database (`TAPE3` from LNFL) to the CLBLM/clblm_data/spectroscopy directory.
 * Use the sceenwriter executable to build the profile input from an existing LBLRTM TAPE5
 ```
 scene_writer TAPE5_user_defined_upwelling  user_archive/scene_files/scenes.nc
 ```
-* For a solar radiance run, set the solar configuration options in solar_config.json and use the build_solar executable to build the solar source function file.
+* For a solar radiance run, set the solar configuration options (ex. start/end wavenumber, solar irradiance data file) in solar_config.json and use the build_solar executable to build the solar source function file (SOLAR.RAD.nc).
 ```
 build_solar solar_config.json
 ```
-* Edit the JSON control file (clblm_config.json) to set the configuration options for the model run (similar to LBLRTM TAPE5 parameters)
+* Edit the JSON control file (clblm_config.json) to set all the configuration options (similar to LBLRTM TAPE5 parameters) for the model run. 
 * Run the CLBLM executable.
 ```
 clblm
@@ -174,7 +177,7 @@ Absorption/emission spectra are comprised of a complicated array of spectral lin
 
 3. **Radiance Derivatives (Jacobians)**
 
-The Analytical Jacobians can be output directly from CLBLM. Simply set "clblm_out" to "jacobians" and specify which jacobians you want to run (ex. "jacobian-list": ["T","H2O","Tskin","emis") in the clblm_config.json input file. See the CLBLM example package and instructions for more details.
+CLBLM features a straighforward setup for Jacobians, in which Jacobians can be output directly from a single CLBLM run. In the clblm_config.json input file, set "clblm_out" to "jacobians" and specify which jacobians you want to run (ex. "jacobian-list": ["T","H2O","Tskin","emis"]) . See the CLBLM example package and instructions for more details.
 
 4. **Is it possible to scale the profile of one or more species?**
 
@@ -204,7 +207,7 @@ Absorption due to clouds and aerosols is not available with the initial release 
 
 8. **Solar Radiance**
 
-Solar radiance calculations can be performed by utilizing a particular solar source function file `SOLAR.RAD`. A `SOLAR.RAD` file can be generated with program `build_solar`. The Kurucz solar source function has been used in AER’s research in shortwave radiation and is based on theoretical radiative transfer calculations for the solar atmosphere. The solar source function is available is at a high spectral resolution (i.e. for monochromatic calculations) and 1 cm<sup>-1</sup> resolution. See the CLBLM example package and instructions for more details.
+Solar radiance calculations can be performed by utilizing a particular solar source function file `SOLAR.RAD.nc`. A `SOLAR.RAD.nc` file can be generated with the program `build_solar`. The AER solar source function is based on information from the NRLSSI2 model, allowing the user to account for solar variability. The solar source function is available is at a high spectral resolution (i.e. for monochromatic calculations) and 1 cm<sup>-1</sup>? resolution. See the CLBLM example package and instructions for more details.
 
 9. **Line coupling/mixing**
 
@@ -214,5 +217,5 @@ Line coupling parameters are utilized in LBLRTM for O<sub>2</sub>, CO<sub>2</sub
 
 11. **How do you calculate fluxes?**
 
-Radiative fluxes and heating rates can be output directly from CLBLM. Simply add a "flux-flags" group to clblm_config.json and specify the flux parameters, such as the spectral interval for the flux output and the number of quadrature angles to use for the flux calculation (ex. {"flux_flag":true, "dv_flux":10.0,"nang":3}). See the CLBLM example package and instructions for more details.
+CLBLM features built-in flux calculations, such that radiative fluxes and heating rates can be output directly from a single CLBLM run. In the clblm_config.json input file, add a "flux-flags" group  and specify the flux parameters, such as the spectral interval for the flux output and the number of quadrature angles to use for the flux calculation (ex. {"flux_flag":true, "dv_flux":10.0,"nang":3}). See the CLBLM example package and instructions for more details.
 
