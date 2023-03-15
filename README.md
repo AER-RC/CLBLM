@@ -131,7 +131,7 @@ The CLBLM convention is that layer 1 is at the highest pressure level (lowest al
 ## Output files for CLBLM <a name="clblmout"></a>
 The CLBLM output is a netCDF file containing the desired output (ex. transmittances/radiances).
 
-The file specifies the dimensions of the output as the number of points in the model run (`numPoints`) and for some runs, the number of vertical levels (`numLayers`). The global attributes include the (`spectralDataType`) such as "monochromatic" or "convolved", the starting and ending points of the model run (_v<sub>1</sub>_ and _v<sub>2</sub>_), and the spectral spacing of the points (`dv`). 
+The file specifies the dimensions of the output as the number of points in the model run (_numPoints_) and for some runs, the number of vertical levels (_numLayers_). The global attributes include the (_spectralDataType_) such as "monochromatic" or "convolved", the starting and ending points of the model run (_v<sub>1</sub>_ and _v<sub>2</sub>_), and the spectral spacing of the points (_dv_). 
 
 
 ## Sequence for running CLBLM <a name="clblmseq"></a>
