@@ -216,7 +216,7 @@ The CLBLM package contains two solar irradiance datasets; an average solar irrad
 ```
 "solar-irradiance":           {"option": 2, "cycle-frac" :0.382576, "facula-var": 1.0, "spot-var": 1.0}
 ```
-Solar radiance runs with CLBLM require a solar source function file named `SOLAR.RAD.nc`. The user will generate `SOLAR.RAD.nc` using the `build_solar` executable to extract solar irradiance data from one of the above datasets. The solar configuration options (ex. start/end wavenumber, solar irradiance dataset) for `build_solar` are specified in the solar_config.json. For example,
+Solar radiance runs with CLBLM require a solar source function file named `SOLAR.RAD.nc`. The user will generate `SOLAR.RAD.nc` using the `build_solar` executable to extract solar irradiance data from one of the above datasets. The solar configuration options (i.e. solar irradiance dataset, start/end wavenumber) for `build_solar` are specified in the solar_config.json. For example,
 ```
 "inputs":                     [{"path": "/clblm_data/solar_irradiance/build_comb_solar_rad_multi_comp_50000plus.nc",
                                 "start-wavenumber":22000.0,
