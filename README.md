@@ -118,7 +118,7 @@ CLBLM is used to generate line-by-line upwelling and downwelling transmittances 
 
 ## Required input files for CLBLM <a name="clblmin"></a>
 1. `scenes.nc`: NetCDF file containing profile information (ex. temperature, pressure, molecular amounts, etc.) required to run CLBLM.
-2. `clblm_config.json`: JSON control file with model run parameters (ex. requested output, spectral inverval, instrument functions, etc.) , required to run CLBLM.
+2. `clblm_config.json`: JSON control file with model run parameters (ex. requested output, spectral inverval, instrument functions, etc.)
 
 CLBLM does not have a limit for the spectral interval, unlike LBLRTM (runs must not exceed 2000 cm<sup>-1</sup>). 
 
