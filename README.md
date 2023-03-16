@@ -210,7 +210,18 @@ Absorption due to clouds and aerosols is not available with the initial release 
 
 8. **Solar Radiance**
 
-Solar radiance calculations can be performed by utilizing a particular solar source function file `SOLAR.RAD.nc`. The `SOLAR.RAD.nc` file can be generated with the program `build_solar`. The AER solar source function is based on information from the NRLSSI2 model, allowing the user to account for solar variability. The solar source function is available is at a high spectral resolution (i.e. for monochromatic calculations) and 1 cm<sup>-1</sup>? resolution. See the CLBLM example package and instructions for more details.
+The CLBLM package contains two solar irradiance datasets; an average solar irradiance file with no temporal variability and a multicomponent solar irradiance file that allows the user to account for variability in the 11-year solar cycle, facular brighening and sunspot darkening. The solar irradiance data is derived from the NRLSSI2 model and covers a wavenumber range of 100-860000. Parameters for solar radiance calculations are set in the clblm_config.json file. For example,
+```
+"solar-irradiance":           {"option": 2, "cycle-frac" :0.382576, "facula-var": 1.0, "spot-var": 1.0}
+```
+Solar radiance runs with CLBLM require a solar source function file named `SOLAR.RAD.nc`. The user will generate `SOLAR.RAD.nc` using the `build_solar` executable to extract solar irradiance data from one of the above datasets. The parameters for `build_solar` are specified in the solar_config.json. For example,
+```
+"inputs":                     [{"path": "/project/p2326/broot/build_comb_solar_rad_multi_comp_50000plus.nc",
+                                "start-wavenumber":22000.0,
+                                "end-wavenumber":24000.0}],
+
+```
+See the CLBLM example package and instructions for more details.
 
 9. **Line coupling/mixing**
 
