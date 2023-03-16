@@ -220,7 +220,6 @@ Solar radiance runs with CLBLM require a solar source function file named `SOLAR
 "inputs":                     [{"path": "/clblm_data/solar_irradiance/build_comb_solar_rad_multi_comp_50000plus.nc",
                                 "start-wavenumber":22000.0,
                                 "end-wavenumber":24000.0}],
-
 ```
 See the CLBLM example package and instructions for more details.
 
@@ -232,8 +231,8 @@ Line coupling parameters are utilized in LBLRTM for O<sub>2</sub>, CO<sub>2</sub
 
 11. **How do you calculate fluxes?**
 
-CLBLM features built-in flux calculations, such that radiative fluxes and heating rates can be output directly from a single CLBLM run. In the clblm_config.json input file, add the flux-flags group and specify the flux parameters, such as the spectral interval for the flux output and the number of quadrature angles to use for the flux calculation. See the CLBLM example package and instructions for more details.
+CLBLM features built-in flux calculations, such that radiative fluxes and heating rates can be output directly from a single CLBLM run. In the clblm_config.json input file, add the flux-flags group and specify the flux parameters, such as the spectral interval for the flux output and the number of quadrature angles to use for the flux calculation. For example, 
 ```
 "flux-flags":                  {"flux_flag":true, "dv_flux":10.0,"nang":3}
 ```
-
+See the CLBLM example package and instructions for more details.
