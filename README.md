@@ -145,10 +145,6 @@ make all
 ```
 scene_writer TAPE5_user_defined_upwelling  user_archive/scene_files/scenes.nc
 ```
-* For a solar radiance run, set the solar configuration options (ex. start/end wavenumber, solar irradiance data file) in solar_config.json and use the build_solar executable to build the solar source function file (SOLAR.RAD.nc).
-```
-build_solar solar_config.json
-```
 * Edit the JSON control file (clblm_config.json) to set all the configuration options (similar to LBLRTM TAPE5 parameters) for the model run. 
 * Run the CLBLM executable.
 ```
@@ -158,7 +154,7 @@ clblm
 # Tests <a name="tests"></a>
 
 A [run example package](https://github.com/AER-RC/CLBLM/releases/tag/v1/clblm_v1.examples.tar) is provided separately from the code repository. It can be used to validate building and running of the model for select atmospheric specifications and model configurations. See `README.setup` in top level of the package for further direction.
-The CLBLM release package contains five example runs, chosen to represent the utility of CLBLM to calculate different outputs across the spectral range. The included python script can be used to run the example package. The examples include
+The CLBLM release package contains five example runs, chosen to represent the utility of CLBLM to calculate different outputs across the spectral range. The included python script can be used to run the example package. The example runs include the following:
 1. Infrared monochromatic downwelling radiance (AERI case)
 2. Infrared convolved (with ILS) upwelling radiance (IASI case)
 3. Solar radiance with NRL 3-component solar variability (Solar case)
@@ -220,11 +216,15 @@ The CLBLM package contains two solar irradiance datasets; an average solar irrad
 ```
 "solar-irradiance":           {"option": 2, "cycle-frac" :0.382576, "facula-var": 1.0, "spot-var": 1.0}
 ```
-Solar radiance runs with CLBLM require a solar source function file named `SOLAR.RAD.nc`. The user will generate `SOLAR.RAD.nc` using the `build_solar` executable to extract solar irradiance data from one of the above datasets. The parameters for `build_solar` are specified in the solar_config.json. For example,
+Solar radiance runs with CLBLM require a solar source function file named `SOLAR.RAD.nc`. The user will generate `SOLAR.RAD.nc` using the `build_solar` executable to extract solar irradiance data from one of the above datasets. The solar configuration options (ex. start/end wavenumber, solar irradiance dataset) for `build_solar` are specified in the solar_config.json. For example,
 ```
 "inputs":                     [{"path": "/clblm_data/solar_irradiance/build_comb_solar_rad_multi_comp_50000plus.nc",
                                 "start-wavenumber":22000.0,
                                 "end-wavenumber":24000.0}],
+```
+Then `build_solar` is executed to build the solar source function file (SOLAR.RAD.nc).
+```
+build_solar solar_config.json
 ```
 See the CLBLM example package and instructions for more details.
 
