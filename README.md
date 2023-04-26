@@ -119,7 +119,7 @@ CLBLM is used to generate line-by-line upwelling and downwelling transmittances 
 ## Required input files for CLBLM <a name="clblmin"></a>
 1. `scenes.nc`: NetCDF file containing profile information (ex. temperature, pressure, molecular amounts, etc.) required to run CLBLM.
 
-In scenes.nc, XS molecules are treated the same as every other molecule (unlike LBLRM which specifies XS molecules separately). In scenes.nc, the "molecules" attribute lists all molecules (regular and XS) in the scene, and the numMol dimension gives the total number of molecules (regular and XS). The molDensities variables [numMol, numPrflLev] then gives the molecular concentration on levels for all molecules (regular and XS).
+In scenes.nc, cross-sectional (XS) molecules are treated the same as every other molecule (unlike LBLRM which specifies XS molecules separately). In scenes.nc, the "molecules" attribute lists all molecules (regular and XS) in the scene, and the numMol dimension gives the total number of molecules (regular and XS). The molDensities variables [numMol, numPrflLev] then gives the molecular concentration on levels for all molecules.
 
 2. `clblm_config.json`: JSON control file with model run parameters (ex. requested output, spectral inverval, instrument functions, etc.)
 
