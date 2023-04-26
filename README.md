@@ -141,7 +141,7 @@ The file specifies the dimensions of the output as the number of points in the m
 make all
 ``` 
 * Link the line parameter database (`TAPE3` from LNFL) to CLBLM/clblm_data/spectroscopy/TAPE3.
-* Build the profile input (scenes.nc). This can be done in one of two ways. Either by creating your own netcdf with profile inputs or building a netcdf from an existing LBLRTM TAPE5. For the latter, the scene_writer executable will convert an LBLRTM TAPE5 into netcdf format for use by CLBLM. In the example below, sceen_writer is executed (first argument is the TAPE5 to convert, second argument specifies the output destination and name).
+* Build the profile input file (scenes.nc). This can be done in one of two ways. Either by creating your own netcdf with profile inputs or building a netcdf from an existing LBLRTM TAPE5. For the latter, the scene_writer executable will convert an LBLRTM TAPE5 into netcdf format for use by CLBLM. In the example below, sceen_writer is executed (the first argument is the TAPE5 to convert, second argument specifies the output destination).
 ```
 scene_writer TAPE5_user_defined_upwelling  user_archive/scene_files/scenes.nc
 ```
