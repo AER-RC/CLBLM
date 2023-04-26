@@ -118,6 +118,9 @@ CLBLM is used to generate line-by-line upwelling and downwelling transmittances 
 
 ## Required input files for CLBLM <a name="clblmin"></a>
 1. `scenes.nc`: NetCDF file containing profile information (ex. temperature, pressure, molecular amounts, etc.) required to run CLBLM.
+
+In scenes.nc, XS molecules are treated the same as every other molecule (unlike LBLRM which specifies XS molecules separately). In scenes.nc, the "molecules" attribute lists all molecules (regular and XS) in the scene, and the numMol dimension gives the total number of molecules (regular and XS). The molDensities variables [numMol, numPrflLev] then gives the molecular concentration on levels for all molecules (regular and XS).
+
 2. `clblm_config.json`: JSON control file with model run parameters (ex. requested output, spectral inverval, instrument functions, etc.)
 
 CLBLM does not have a limit for the spectral interval, unlike LBLRTM (runs must not exceed 2000 cm<sup>-1</sup>). 
@@ -141,7 +144,7 @@ The file specifies the dimensions of the output as the number of points in the m
 make all
 ``` 
 * Link the line parameter database (`TAPE3` from LNFL) to CLBLM/clblm_data/spectroscopy/TAPE3.
-* Build the profile input file (scenes.nc). This can be done in one of two ways. Either by creating your own netcdf with profile inputs or building a netcdf from an existing LBLRTM TAPE5. For the latter, the scene_writer executable will convert an LBLRTM TAPE5 into netcdf format for use by CLBLM. In the example below, sceen_writer is executed (the first argument is the TAPE5 to convert, second argument specifies the output destination).
+* Build the profile input file (`scenes.nc`). This can be done in one of two ways. Either by creating your own netcdf with profile inputs or building a netcdf from an existing LBLRTM TAPE5. For the latter, the scene_writer executable will convert an LBLRTM TAPE5 into netcdf format for use by CLBLM. In the example below, sceen_writer is executed (the first argument is the TAPE5 to convert, second argument specifies the output destination).
 ```
 scene_writer TAPE5_user_defined_upwelling  user_archive/scene_files/scenes.nc
 ```
