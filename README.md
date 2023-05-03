@@ -84,7 +84,7 @@ Unformatted files are often not compatible between systems due to differences in
 
 ## LNFL/CLBLM Naming Convention <a name="nomenclature"></a>
 
-Specific information on the input/output files from LNFL and CLBLM is located in their respective instruction manuals, `lnfl_instructions` and `clblm_instructions`, and the examples provided in the code `tar` files.  
+Specific information on the input/output files from LNFL and CLBLM is located in their respective instruction manuals, `lnfl_instructions` and the `CLBLM User Guide`, and the examples provided in the example  `tar` files.  
 
 # Instructions and Tips for Running LNFL <a name="runlnfl"></a>
 
@@ -114,7 +114,7 @@ The `TAPE5` input file is read as formatted FORTRAN. As a consequence of the for
 
 # Instructions and Tips for Compiling and Running CLBLM <a name="runclblm"></a>
 
-CLBLM is used to generate line-by-line upwelling and downwelling transmittances and radiances.
+CLBLM is used to generate line-by-line upwelling and downwelling transmittances, radiances, fluxes and Jacobians.
 
 ## Required input files for CLBLM <a name="clblmin"></a>
 1. `scenes.nc`: NetCDF file containing profile information (ex. temperature, pressure, molecular amounts, etc.) required to run CLBLM.
@@ -123,9 +123,9 @@ In scenes.nc, cross-sectional (XS) molecules are treated the same as every other
 
 2. `clblm_config.json`: JSON control file with model run parameters (ex. requested output, spectral inverval, instrument functions, etc.)
 
-CLBLM does not have a limit for the spectral interval, unlike LBLRTM (runs must not exceed 2000 cm<sup>-1</sup>). 
+CLBLM does not limit the spectral interval, unlike LBLRTM, where runs must not exceed 2000 cm<sup>-1</sup>). 
 
-Other input files are required if you are using the solar source function, cross sections, surface emissivity, etc. See the CLBLM instruction manual and examples provided.
+Other input files are required if you are using the solar source function, cross sections, surface emissivity and reflectivity. See the CLBLM instruction manual and examples provided.
 
 ## Layer numbering scheme <a name="laynum"></a>
 
