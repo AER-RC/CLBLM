@@ -76,7 +76,7 @@ tar xvf clblm_v1.tar.gz
 
 ## Platforms on which CLBLM can be run <a name="platforms"></a>
 
-It is recommended that LNFL and CLBLM be compiled in Fortran 90. LBLRTM has previously been run on DEC alpha, Cray, MS-DOS, and HP platforms.
+It is recommended that LNFL and CLBLM be compiled in Fortran 90. LBLRTM has previously been run on Centos platforms.
 
 ## Issues relating to unformatted files on UNIX and LINUX systems <a name="unformatted"></a>
 
