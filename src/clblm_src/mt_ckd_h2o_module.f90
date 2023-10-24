@@ -94,7 +94,6 @@ Module mt_ckd_h2o
    if (.not. present(radflag)) then
       radflag = .TRUE.
    endif
-   print*,'mt_ckd'
 ! Read in spectral range and coefficients
    if (.not. lread) then
       lread = .True.
@@ -106,7 +105,6 @@ Module mt_ckd_h2o
    endif
 
 ! Find coeff wavenumber range that brackets [wv1abs,wv2abs].
-   print('dat wv', dat%wavenumber)
    dvc = dat%wavenumber(2)-dat%wavenumber(1)
    i=1
    do while (wvn(i) <= (wv1abs-2*dvc))

@@ -1059,7 +1059,6 @@ CONTAINS !=================== Module Contains ==========================
             !--- For double convolution, pick out the narrow lines and
             ! save them into a scratch file for later use.
             if (checkNarrowLine) then
-               stop
 
                ALFL  = SHRUNK%ALFA(IJ)
                ALFAD = SHRUNK%VNU(ij)*ALFD1(m,iso)

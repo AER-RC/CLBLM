@@ -524,18 +524,22 @@ CONTAINS !=================== MODULE CONTAINS ==========================
       SpaceLook = path%geom%Hend > path%geom%HMIN
 
       !---Check to see if zRT covers the whole atmosphere defined by profile
-      if ( .not.SpaceLook ) then
-         reflectingSurf = ( allocated(scene%sfc%surfEm)   .and. any(scene%sfc%surfEm <1.)) .OR. &
-                          ( allocated(scene%sfc%surfRefl) .and. any(scene%sfc%surfRefl >0.))
-         if ( reflectingSurf .and. &
-            ( zRT(nRTLev) < scene%prfl%Z( scene%prfl%nLev ) .or. &
-              zRT(1)      < scene%prfl%Z( 1 )  )) then
-            STOP '--- '//routineName//'(): For down looking sensor over reflecting surface, the RT grid has to cover from surface to TOA.'
-         endif
-      endif
+      !---Remove check and see if code runs. ---- KCP!
+      !if ( .not.SpaceLook ) then
+      !   reflectingSurf = ( allocated(scene%sfc%surfEm)   .and. any(scene%sfc%surfEm <1.)) .OR. &
+      !                    ( allocated(scene%sfc%surfRefl) .and. any(scene%sfc%surfRefl >0.))
+      !   print *,'zRT(nRTLev) , scene%prfl%Z( scene%prfl%nLev) ',zRT(nRTLev) , scene%prfl%Z( scene%prfl%nLev)
+      !   print *,'zRT(1), scene%prfl%Z( 1 ) ', zRT(1), scene%prfl%Z( 1 ) 
+      !   if ( reflectingSurf .and. &
+      !      ( zRT(nRTLev) < scene%prfl%Z( scene%prfl%nLev ) .or. &
+      !        zRT(1)      < scene%prfl%Z( 1 )  )) then
+      !      STOP '--- '//routineName//'(): For down looking sensor over reflecting surface, the RT grid has to cover from surface to TOA.'
+      !   endif
+      !endif
 
       !--- For the viewing path, if Hobs is in the middle of atmosphere,
       !  and look down, extends the viewing path to whole atmosphere
+        
       if ( obsAlt < scene%prfl%Z( scene%prfl%nLev ) .and. &
            obsAlt > scene%prfl%Z( 1 ) .and. &
            .not.SpaceLook ) then

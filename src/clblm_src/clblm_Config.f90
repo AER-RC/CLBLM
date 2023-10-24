@@ -88,8 +88,8 @@ MODULE Module_Config
       logical :: lineOff       = .FALSE.         !Turns calculation of lines contribution off
       logical :: speciesBroad  = .FALSE.         !use species by species broadening parameters.
       logical :: lineRejec     = .TRUE.
-      real    :: DPTMIN        = 0.0002          !Minimum mol. optical depth. if <0 will be set to 0.0002
-      real    :: DPTFAC        = 0.001           !Factor applying to F4 OD to determine line rejection; if <0 will be set to 0.001
+      real    :: DPTMIN        = 0.0000          !Minimum mol. optical depth. if <0 will be set to 0.0000
+      real    :: DPTFAC        = 0.000           !Factor applying to F4 OD to determine line rejection; if <0 will be set to 0.001
 
       !--- Continuum
       logical :: contnmOff = .FALSE.             !Turns continuum contribution off. If=.TRUE. turn on continua and use individual scaling factors

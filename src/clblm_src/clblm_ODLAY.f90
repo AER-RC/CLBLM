@@ -451,6 +451,8 @@ endif
          numNarrowLines = 0
          DV = DVnarrow
       endif
+! Skip narrow lines code   KCP !
+      numNarrowLines = 0
 
 
       !--- Allocate buffer(s) for OD spectrum/spectra
