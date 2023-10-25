@@ -139,7 +139,7 @@ The file specifies the dimensions of the output as the number of points in the m
 
 ## Sequence for running CLBLM <a name="clblmseq"></a>
 * [Clone the latest CLBLM code](https://github.com/AER-RC/CLBLM#cloning-the-latest-release-) and download the latest line parameter database with the [AER Line File repository](https://github.com/AER-RC/AER_Line_File) or from [Zenodo](https://zenodo.org/record/4019178).
-* Compile CLBLM, scene_writer, and build_solar with the makefile in the CLBLM tar file.
+* Compile CLBLM, scene_writer, and build_solar with the makefile in the CLBLM tar file. Set the environment variable CL to gfortran before compiling.
 ```
 make all
 ``` 
