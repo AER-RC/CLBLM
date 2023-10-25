@@ -156,7 +156,7 @@ clblm
 
 # Tests <a name="tests"></a>
 
-A [run example package](https://github.com/AER-RC/CLBLM/releases/tag/v1/clblm_v1.examples.tar) is provided separately from the code repository. It can be used to validate building and running of the model for select atmospheric specifications and model configurations. See `README.setup` in top level of the package for further direction.
+A [run example package]  (https://github.com/AER-RC/CLBLM/releases/tag/v1/clblm_v1.examples.tar) is provided separately from the code repository. It can be used to validate building and running of the model for select atmospheric specifications and model configurations. See `README.setup` in top level of the package for further direction.
 The CLBLM release package contains five example runs, chosen to represent the utility of CLBLM to calculate different outputs across the spectral range. The included python script can be used to run the example package. The example runs include the following:
 1. Infrared monochromatic downwelling radiance (AERI case)
 2. Infrared convolved (with ILS) upwelling radiance (IASI case)
