@@ -51,7 +51,7 @@ Alternatively, users that have not setup an SSH key but have [created a personal
 git clone --recursive https://github.com/AER-RC/CLBLM.git
 ```
 
-`--recursive` is important, because this repository is linked with our [common FORTRAN modules repository](https://github.com/AER-RC/aer_rt_utils) that are required in the model builds. The [cross section database](https://github.com/AER-RC/cross-sections) is also added as a submodule (it is not required for all model runs). If this keyword is forgotten, one can do:
+**`--recursive`** is important, because this repository is linked with our [common FORTRAN modules repository](https://github.com/AER-RC/aer_rt_utils) that are required in the model builds. The [cross section database](https://github.com/AER-RC/cross-sections) is also added as a submodule (it is not required for all model runs). If this keyword is forgotten, one can do:
 
 ```
 git submodule init
@@ -139,7 +139,8 @@ The file specifies the dimensions of the output as the number of points in the m
 
 ## Sequence for running CLBLM <a name="clblmseq"></a>
 * [Clone the latest CLBLM code](https://github.com/AER-RC/CLBLM#cloning-the-latest-release-) and download the latest line parameter database with the [AER Line File repository](https://github.com/AER-RC/AER_Line_File) or from [Zenodo](https://zenodo.org/record/4019178).
-* Compile CLBLM, scene_writer, and build_solar with the makefile in the CLBLM tar file. Set the environment variable CL to gfortran before compiling.
+* Compile CLBLM, scene_writer, and build_solar with the makefile in the CLBLM tar file. **Set the environment variable CL to gfortran before compiling.**
+  
 ```
 make all
 ``` 
