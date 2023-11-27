@@ -76,7 +76,7 @@ tar xvf clblm_v1.tar.gz
 
 ## Platforms on which CLBLM can be run <a name="platforms"></a>
 
-It is recommended that LNFL and CLBLM be compiled in Fortran 90. LBLRTM has previously been run on Centos platforms.
+It is recommended that LNFL and CLBLM be compiled in Fortran 90. CLBLM has previously been run on Centos platforms.
 
 ## Issues relating to unformatted files on UNIX and LINUX systems <a name="unformatted"></a>
 
@@ -139,7 +139,8 @@ The file specifies the dimensions of the output as the number of points in the m
 
 ## Sequence for running CLBLM <a name="clblmseq"></a>
 * [Clone the latest CLBLM code](https://github.com/AER-RC/CLBLM#cloning-the-latest-release-) and download the latest line parameter database with the [AER Line File repository](https://github.com/AER-RC/AER_Line_File) or from [Zenodo](https://zenodo.org/record/4019178).
-* Compile CLBLM, scene_writer, and build_solar with the makefile in the CLBLM tar file. **Set the environment variable CL to gfortran before compiling.**
+* Compile CLBLM, scene_writer, and build_solar with the makefile in the CLBLM tar file.  CLBLM has successufylly been compiled and run with gfortran 4.8.5 and netCF 4.3.3.1
+* **Set the environment variable CL to gfortran before compiling.**
   
 ```
 make all
