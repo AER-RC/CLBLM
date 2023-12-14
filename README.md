@@ -124,9 +124,7 @@ In scenes.nc, cross-sectional (XS) molecules are treated the same as every other
 2. `clblm_config.json`: JSON control file with model run parameters (ex. requested output, spectral inverval, instrument functions, etc.)
 
 CLBLM does not limit the spectral interval, unlike LBLRTM, where runs must not exceed 2000 cm<sup>-1</sup>). 
-
-3. `SOLAR.RAD.nc`: required if using a solar source. It is built by running the build_solar  
-
+ 
 Other input files are required if you are using the solar source function, cross sections, surface emissivity and reflectivity. See the CLBLM instruction manual and examples provided.
 
 ## Layer numbering scheme <a name="laynum"></a>
@@ -219,7 +217,7 @@ Absorption due to clouds and aerosols is not available with the initial release 
 
 8. **Solar Radiance**
 
-The CLBLM package contains two solar irradiance datasets; an average solar irradiance file with no temporal variability and a multicomponent solar irradiance file that allows the user to account for variability in the 11-year solar cycle, facular brighening and sunspot darkening. The solar irradiance data is derived from the NRLSSI2 model and covers a wavenumber range of 100-860000. Parameters for solar radiance calculations are set in the clblm_config.json file. For example,
+The CLBLM package contains two solar irradiance datasets; an average solar irradiance file with no temporal variability and a multicomponent solar irradiance file that allows the user to account for variability in the 11-year solar cycle, facular brighening and sunspot darkening. The solar irradiance data is derived from the NRLSSI2 model and covers a wavenumber range of 100-860000. These datasets must be downloaded from Zenodo (https://zenodo.org/records/10084886). Parameters for solar radiance calculations are set in the clblm_config.json file. For example,
 ```
 "solar-irradiance":           {"option": 2, "cycle-frac" :0.382576, "facula-var": 1.0, "spot-var": 1.0}
 ```
