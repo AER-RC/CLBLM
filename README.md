@@ -88,7 +88,7 @@ Specific information on the input/output files from LNFL and CLBLM is located in
 
 # Instructions and Tips for Running LNFL <a name="runlnfl"></a>
 
-LNFL is used to generate a unformatted file (`TAPE3`) of all the line parameters required by LBLRTM.
+LNFL is used to generate a unformatted file (`TAPE3`) of all the line parameters required by CLBLM.
 
 ## Input files for LNFL <a name="lnflin"></a>
 
@@ -124,6 +124,8 @@ In scenes.nc, cross-sectional (XS) molecules are treated the same as every other
 2. `clblm_config.json`: JSON control file with model run parameters (ex. requested output, spectral inverval, instrument functions, etc.)
 
 CLBLM does not limit the spectral interval, unlike LBLRTM, where runs must not exceed 2000 cm<sup>-1</sup>). 
+
+3. `SOLAR.RAD.nc`: required if using a solar source. It is built by running the build_solar  
 
 Other input files are required if you are using the solar source function, cross sections, surface emissivity and reflectivity. See the CLBLM instruction manual and examples provided.
 
