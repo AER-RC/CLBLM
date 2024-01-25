@@ -228,6 +228,8 @@ integer, SAVE :: JRAD
       real                 :: DVnorm
       integer              :: numNarrowLines
       real                 :: narrowWidth
+! MJI - add small epsilon value for sizeOfBuffer check
+      real, parameter      :: v2eps = 1.e-7
 
 
 
@@ -461,7 +463,8 @@ endif
       ! AND THE LAST NPTS=MPTS VALUES ENDING AT NLIM OF THE R1 ARRAY
       !
       sizeOfBuffer = ceiling( (V2-V1)/DV  + 1. )
-      if (V1+real(sizeOfBuffer-1)*DV <=V2) sizeOfBuffer=sizeOfBuffer+1  ! "+1" to ensure the last point is beyond V2
+! MJI - Revised sizeOfBuffer check by adding v2eps to allow check to pass and add extra point beyond numerical precision
+      if (V1+real(sizeOfBuffer-1)*DV <=V2+v2eps) sizeOfBuffer=sizeOfBuffer+1  ! "+1" to ensure the last point is beyond V2
 
       allocate( r1BuffNorm( sizeOfBuffer ), STAT=iStat )
       !if (NLTE==.TRUE.) allocate( rr1BuffNorm( sizeOfBuffer ), STAT=iStat )
