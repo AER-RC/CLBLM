@@ -31,7 +31,7 @@ CLBLM uses the line parameters and [MT_CKD continuum](https://github.com/AER-RC/
 
 | CLBLM Release | MT_CKD Release | Line File |
 | :---: | :---: | :---: |
-| [v1.1](https://github.com/AER-RC/CLBLM/releases/tag/v1.1) | [4.1.1](https://github.com/AER-RC/MT_CKD/releases/tag/4.1.1) | [v3.8.1](https://zenodo.org/record/4019178/files/aer_v_3.8.1.tar.gz?download=1) |
+| [v1.2](https://github.com/AER-RC/CLBLM/releases/tag/v1.2) | [4.2](https://github.com/AER-RC/MT_CKD/releases/tag/4.2) | [v3.8.1](https://zenodo.org/record/4019178/files/aer_v_3.8.1.tar.gz?download=1) |
 
 If any build or run issues occur, please [create an issue](https://github.com/AER-RC/LBLRTM/issues) or contact the [AER-RC Group](https://github.com/AER-RC).
 
@@ -60,10 +60,10 @@ git submodule update
 
 in the `CLBLM` directory.
 
-The current release is CLBLM v1.1, and it is recommended that this be the version that users clone and checkout (rather than the `master` branch). To do this, one needs to simply checkout the `v1.1` tag:
+The current release is CLBLM v1.2, and it is recommended that this be the version that users clone and checkout (rather than the `master` branch). To do this, one needs to simply checkout the `v1.2` tag:
 
 ```
-git checkout tags/v1.1
+git checkout tags/v1.2
 ```
 
 Instead of cloning, users can also download a CLBLM [tarball](https://github.com/AER-RC/CLBLM/archive/v1.zip) and unpack it:
