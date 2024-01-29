@@ -56,7 +56,7 @@ MODULE read_file
     integer(kind=4)   :: ncid
     integer(kind=4)   :: nWavenumbers
     integer(kind=4)   :: stat
-    print*'get data function'
+    print*,'get data function'
     ! check on the file
     inquire(file = fname, EXIST=isError)
     isError = .NOT. isError
