@@ -51,7 +51,7 @@ Alternatively, users that have not setup an SSH key but have [created a personal
 git clone --recursive https://github.com/AER-RC/CLBLM.git
 ```
 
-`--recursive` is important, because this repository is linked with our [common FORTRAN modules repository](https://github.com/AER-RC/aer_rt_utils) that are required in the model builds. The [cross section database](https://github.com/AER-RC/cross-sections) is also added as a submodule (it is not required for all model runs). If this keyword is forgotten, one can do:
+**`--recursive`** is important, because this repository is linked with our [common FORTRAN modules repository](https://github.com/AER-RC/aer_rt_utils) that are required in the model builds. The [cross section database](https://github.com/AER-RC/cross-sections) is also added as a submodule (it is not required for all model runs). If this keyword is forgotten, one can do:
 
 ```
 git submodule init
@@ -60,23 +60,23 @@ git submodule update
 
 in the `CLBLM` directory.
 
-The current release is CLBLM v1, and it is recommended that this be the version that users clone and checkout (rather than the `master` branch). To do this, one needs to simply checkout the `v1.2` tag:
+The current release is CLBLM v1.2, and it is recommended that this be the version that users clone and checkout (rather than the `master` branch). To do this, one needs to simply checkout the `v1.2` tag:
 
 ```
 git checkout tags/v1.2
 ```
 
-Instead of cloning, users can also download a CLBLM [tarball](https://github.com/AER-RC/CLBLM/archive/v1.2.zip) and unpack it:
+Instead of cloning, users can also download a CLBLM [tarball](https://github.com/AER-RC/CLBLM/archive/v1.zip) and unpack it:
 
 ```
-tar xvf clblm_v1.2.tar.gz
+tar xvf clblm_v1.tar.gz
 ```
 
 # General LNFL/CLBLM File Information <a name="general"></a>
 
 ## Platforms on which CLBLM can be run <a name="platforms"></a>
 
-It is recommended that LNFL and CLBLM be compiled in Fortran 90. LBLRTM has previously been run on Centos platforms.
+It is recommended that LNFL and CLBLM be compiled in Fortran 90. CLBLM has previously been run on Centos platforms.
 
 ## Issues relating to unformatted files on UNIX and LINUX systems <a name="unformatted"></a>
 
@@ -88,7 +88,7 @@ Specific information on the input/output files from LNFL and CLBLM is located in
 
 # Instructions and Tips for Running LNFL <a name="runlnfl"></a>
 
-LNFL is used to generate a unformatted file (`TAPE3`) of all the line parameters required by LBLRTM.
+LNFL is used to generate a unformatted file (`TAPE3`) of all the line parameters required by CLBLM.
 
 ## Input files for LNFL <a name="lnflin"></a>
 
@@ -124,7 +124,7 @@ In scenes.nc, cross-sectional (XS) molecules are treated the same as every other
 2. `clblm_config.json`: JSON control file with model run parameters (ex. requested output, spectral inverval, instrument functions, etc.)
 
 CLBLM does not limit the spectral interval, unlike LBLRTM, where runs must not exceed 2000 cm<sup>-1</sup>). 
-
+ 
 Other input files are required if you are using the solar source function, cross sections, surface emissivity and reflectivity. See the CLBLM instruction manual and examples provided.
 
 ## Layer numbering scheme <a name="laynum"></a>
@@ -139,7 +139,9 @@ The file specifies the dimensions of the output as the number of points in the m
 
 ## Sequence for running CLBLM <a name="clblmseq"></a>
 * [Clone the latest CLBLM code](https://github.com/AER-RC/CLBLM#cloning-the-latest-release-) and download the latest line parameter database with the [AER Line File repository](https://github.com/AER-RC/AER_Line_File) or from [Zenodo](https://zenodo.org/record/4019178).
-* Compile CLBLM, scene_writer, and build_solar with the makefile in the CLBLM tar file. Set the environment variable CL to gfortran before compiling.
+* Compile CLBLM, scene_writer, and build_solar with the makefile in the CLBLM tar file.  CLBLM has successufylly been compiled and run with gfortran 4.8.5 and netCF 4.3.3.1
+* **Set the environment variable CL to gfortran before compiling.**
+  
 ```
 make all
 ``` 
@@ -156,7 +158,7 @@ clblm
 
 # Tests <a name="tests"></a>
 
-A [run example package]  (https://github.com/AER-RC/CLBLM/releases/download/1.0/clblm_examples.tar) is provided separately from the code repository. It can be used to validate building and running of the model for select atmospheric specifications and model configurations. See `README.setup` in top level of the package for further direction.
+A [run example package](https://github.com/AER-RC/CLBLM/releases/download/1.0/clblm_examples.tar) is provided separately from the code repository. It can be used to validate building and running of the model for select atmospheric specifications and model configurations. See `README.setup` in top level of the package for further direction.
 The CLBLM release package contains five example runs, chosen to represent the utility of CLBLM to calculate different outputs across the spectral range. The included python script can be used to run the example package. The example runs include the following:
 1. Infrared monochromatic downwelling radiance (AERI case)
 2. Infrared convolved (with ILS) upwelling radiance (IASI case)
@@ -215,7 +217,7 @@ Absorption due to clouds and aerosols is not available with the initial release 
 
 8. **Solar Radiance**
 
-The CLBLM package contains two solar irradiance datasets; an average solar irradiance file with no temporal variability and a multicomponent solar irradiance file that allows the user to account for variability in the 11-year solar cycle, facular brighening and sunspot darkening. The solar irradiance data is derived from the NRLSSI2 model and covers a wavenumber range of 100-860000. Parameters for solar radiance calculations are set in the clblm_config.json file. For example,
+The CLBLM package contains two solar irradiance datasets; an average solar irradiance file with no temporal variability and a multicomponent solar irradiance file that allows the user to account for variability in the 11-year solar cycle, facular brighening and sunspot darkening. The solar irradiance data is derived from the NRLSSI2 model and covers a wavenumber range of 100-860000. These datasets must be downloaded from Zenodo (https://zenodo.org/records/10084886). Parameters for solar radiance calculations are set in the clblm_config.json file. For example,
 ```
 "solar-irradiance":           {"option": 2, "cycle-frac" :0.382576, "facula-var": 1.0, "spot-var": 1.0}
 ```
