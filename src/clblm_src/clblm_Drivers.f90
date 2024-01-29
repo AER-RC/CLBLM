@@ -442,13 +442,13 @@ CONTAINS !======================  MODULE CONTAINS ======================
 
       OUT = (V2 - V1)/(DV_flux)
       NOUT = INT (OUT + EPS)
-      allocate (flux_bound(nout))
+      allocate (flux_bound(nout+1))
       flux_bound(:)=0.
    ! For output, calculate wavenumber, net flux and heating rate
-      DO K = 1, NOUT-1
+      DO K = 1, NOUT
          flux_BOUND(K) = V1 + dv_flux * FLOAT(K-1)
       enddo
-      flux_BOUND(NOUT) = V2
+      flux_BOUND(NOUT+1) = V2
 
 !Compute net fluxes and heating rates, then output fluxes and
 !heating rates from top of atmosphere down for each level.
