@@ -18,6 +18,7 @@ MODULES_DIR = src/modules/
 
 # ifort or gfortran; *** CON NOT HAVE SPACE BEFORE OR AFTER ***
 CL?=ifort
+CL=gfortran
 
 LIB_TYPE = "static"	# static or dynamic library linking; this is a TODO
 
@@ -25,7 +26,8 @@ LIB_TYPE = "static"	# static or dynamic library linking; this is a TODO
 # NOTE: As of right now, CLBLM will not build with gfortran using -std=f2003 or -std=f2008, since not all the source code actually adheres to either of these standards.
 ifeq ($(CL),gfortran)
     #CFLAGS = -fbounds-check -fdefault-real-8 -frecord-marker=4 -g -fpic -DGFORTRAN -cpp -ffree-line-length-none -fno-align-commons -J ./modules/
-    CFLAGS = -fno-range-check -fbounds-check -fdefault-real-8 -frecord-marker=4 -g -fpic -DGFORTRAN -cpp -ffree-line-length-none -fno-align-commons -J $(MODULES_DIR)
+    CFLAGS = -fno-range-check -fbounds-check -fdefault-real-8 -frecord-marker=4 -g -fpic -DGFORTRAN -cpp -ffree-line-length-none -fno-align-commons -J $(MODULES_DIR) -std='legacy'
+    CFLAGS_SOLAR = -fno-range-check -fbounds-check  -frecord-marker=4 -g -fpic -DGFORTRAN -cpp -ffree-line-length-none -fno-align-commons -J $(MODULES_DIR) -std='legacy'
 endif
 
 # Intel Compiler setup
@@ -71,13 +73,13 @@ CLBLM_SRC = $(CLBLM_DIR)/clblm_Config.f90 \
 			 $(CLBLM_DIR)/mt_ckd_h2o_module.f90 \
 	         $(CLBLM_DIR)/clblm_ODLAY_Continuum.f90 \
 	         $(CLBLM_DIR)/clblm_ODLAY_LineF4.f90 \
+	         $(CLBLM_DIR)/voigt_module.f90 \
 	         $(CLBLM_DIR)/clblm_ODLAY.f90 \
-            $(CLBLM_DIR)/solar_cycle.f90\
-            $(CLBLM_DIR)/clblm_Solar.f90\
+             $(CLBLM_DIR)/solar_cycle.f90\
+             $(CLBLM_DIR)/clblm_Solar.f90\
 	         $(CLBLM_DIR)/clblm_noScattRT.f90 \
 	         $(CLBLM_DIR)/clblm_noScattJac.f90 \
-	         $(CLBLM_DIR)/clblm_Drivers.f90 \
-	         $(CLBLM_DIR)/clblm_Modules.f90
+	         $(CLBLM_DIR)/clblm_Drivers.f90
 
 CLBLM_OBJ = $(patsubst %.f90,%.o,$(CLBLM_SRC))
 CLBLM_LIB: $(CLBLM_OBJ)
@@ -146,7 +148,10 @@ scene_writer: libs $(EXEC_OBJ)
 
 # NetCDF file builder
 build_solar: libs $(EXEC_OBJ)
-	$(CL) $(CFLAGS) $(INCLUDES) -o build_solar $(APP_DIR)/build_solar.o $(LINKING_COMMAND)
+	$(CL) $(CFLAGS_SOLAR) $(INCLUDES) -o build_solar $(APP_DIR)/build_solar.o $(LINKING_COMMAND)
+
+$(APP_DIR)/build_solar.o:$(APP_DIR)/build_solar.f90
+	$(CL) -c $(CFLAGS_SOLAR) $(INCLUDES) $< -o $@
 
 # clblm main
 clblm: libs $(EXEC_OBJ)

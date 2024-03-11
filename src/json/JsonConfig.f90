@@ -449,20 +449,23 @@ logical function getConfigFileStruct_OdFlags(jsonlist, config, errStr)
     character(len=maxNameLength) :: keys(2)
     real, allocatable :: tempFloatArray(:)
     logical :: logicDummy
+    integer :: intDummy
 
     errStr = repeat(' ', len(errStr))
     getConfigFileStruct_OdFlags = .false.
     keys(1) = returnString(OD_FLAGS_TRIGGER)
 
     keys(2) = returnString('lines-contribution')
-    call assignScalar(jsonlist, keys, logicDummy,config%lines_contribution, errStr)
+    call assignScalar(jsonlist, keys, logicDummy, config%lines_contribution, errStr)
 
     keys(2) = returnString('continuum-contribution')
-    call assignScalar(jsonlist, keys, logicDummy,config%continuum_contribution, errStr)
+    call assignScalar(jsonlist, keys, logicDummy, config%continuum_contribution, errStr)
 
     keys(2) = returnString('collision-partners-broadening')
-    call assignScalar(jsonlist, keys, logicDummy,config%collision_partners_broadening, errStr)
+    call assignScalar(jsonlist, keys, logicDummy, config%collision_partners_broadening, errStr)
 
+    keys(2) = returnString('speed-dependent-voigt')
+    call assignScalar(jsonlist, keys, config%sdep_voigt_flag, errStr)
 !------>
 ! IP
 ! activate reading of line-rejection status

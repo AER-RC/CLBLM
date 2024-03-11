@@ -46,7 +46,7 @@ module validateJSONmodule
 
    ! character(len=*), parameter :: TARGET_VIEWING_TRIGGER             = "target-viewing"
 
-   logical, parameter :: dbg = .true.
+   logical, parameter :: dbg = .false.
    logical, parameter :: caseSensitiveValidation=.true.
 
 contains    
@@ -453,6 +453,7 @@ logical function validate_OD_FLAGS_TRIGGER(dat)
       if (compareStrings(bufStr, 'collision-partners-broadening')) cycle
       if (compareStrings(bufStr, 'line-rejection'               )) cycle
       if (compareStrings(bufStr, 'line-rejection-params'        )) cycle
+      if (compareStrings(bufStr, 'speed-dependent-voigt'        )) cycle
       if (compareStrings(bufStr, 'x-sections-p-convolution'     )) cycle
       if (compareStrings(bufStr, 'continuum-scaling'            )) cycle
       print *,'ERR: validateJSONmodule - key unknown : ',  &

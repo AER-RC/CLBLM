@@ -16,7 +16,7 @@ MODULE Module_ODLAY
       module procedure ODLAY_struct
       module procedure ODLAY_nonStruct
    END INTERFACE
-
+   logical, parameter :: dbg =.false.
 CONTAINS !===================== Module Contains ========================
 
 
@@ -121,7 +121,7 @@ CONTAINS !===================== Module Contains ========================
       endif
       endif
 
-   END SUBROUTINE
+   END SUBROUTINE ODLAY_struct
 
 
 !-----------------------------------------------------------------------
@@ -346,10 +346,10 @@ integer, SAVE :: JRAD
       !
       !EQUIVALENCE FSCDID YI1
       IPATHL = IPATH !for RT and "IF (IEMST.EQ.0.AND.IPATHL.EQ.2) DPTMIN = 2.*DPTMST"
-if (firstPassJRAD) then !to be consistent with LBLRTM
-      JRAD   = odCtrl%JRAD !may be modified in ODLAY subs
-firstPassJRAD=.FALSE.
-endif
+      if (firstPassJRAD) then !to be consistent with LBLRTM
+            JRAD   = odCtrl%JRAD !may be modified in ODLAY subs
+      firstPassJRAD=.FALSE.
+      endif
 
       !COMMON /CONVF/ !use: (block data popdpt) JCNVF4
       JCNVF4 = 0
@@ -478,7 +478,7 @@ endif
                    XSELF,XFRGN,XCO2C,XO3CN,XO2CN,XN2CN,XRAYL,IAERSL,icflg,&
                    odCtrl%lineOff, XsectOff, contnmOff,IXSBIN,XSFILE,IXFORM,NSPECR,NTEMPF,XDOPLR,LnOrXs,NUMXS,&
                    NOPR,NFHDRF,NPHDRF,NPHDRL,NLNGTH, &
-                   numNarrowLines, narrowWidth)
+                   numNarrowLines, narrowWidth, odCtrl%sdep_voigt_flag)
 
 
       !--- For very narrow lines, do a second round convolution on finer spectral grid.
@@ -513,7 +513,7 @@ endif
                       XSELF,XFRGN,XCO2C,XO3CN,XO2CN,XN2CN,XRAYL,IAERSL,icflg,&
                       odCtrl%lineOff, XsectOff, contnmOff,IXSBIN,XSFILE,IXFORM,NSPECR,NTEMPF,XDOPLR,LnOrXs,NUMXS,&
                       NOPR,NFHDRF,NPHDRF,NPHDRL,NLNGTH, &
-                      numNarrowLines, narrowWidth)
+                      numNarrowLines, narrowWidth, odCtrl%sdep_voigt_flag)
 
 
          allocate( tempBuff( size(r1BuffFine) ))
@@ -608,7 +608,7 @@ endif
       if (allocated(rr1BuffFine)) deallocate(rr1BuffFine)
       if (allocated(tempBuff))    deallocate(tempBuff)
 
-   END SUBROUTINE
+   END SUBROUTINE ODLAY_nonStruct
 
 
    !-----------------------------------------------------------------
@@ -747,7 +747,7 @@ endif
          end select
       enddo
 
-   END SUBROUTINE
+   END SUBROUTINE seperateLineXsISO
 
 
 
@@ -761,7 +761,7 @@ endif
                          XSELF,XFRGN,XCO2C,XO3CN,XO2CN,XN2CN,XRAYL,IAERSL,icflg,&
                          lineOff,XsectOff,contnmOff,IXSBIN,XSFILE,IXFORM,NSPECR,NTEMPF,XDOPLR,LnOrXs,NUMXS,&
                          NOPR,NFHDRF,NPHDRF,NPHDRL,NLNGTH, &
-                         numNarrowLines, narrowWidth)
+                         numNarrowLines, narrowWidth, sdep_voigt_flag)
 !-----------------------------------------------------------------------
       USE Module_ConstParam  ,ONLY: r8=>kind_r8, RADCN2, &
                                     N_ABSRB, MAXSTATE, Max_ISO, MXMOL
@@ -820,6 +820,7 @@ endif
       integer      ,intent(in)    :: NFHDRF,NPHDRF,NPHDRL,NLNGTH
       integer      ,intent(inout) :: numNarrowLines
       real         ,intent(in)    :: narrowWidth
+      logical,      intent(in)    :: sdep_voigt_flag
 
 
       !--- Local variables
@@ -944,7 +945,7 @@ endif
                    ABSRB,DVABS,V1ABS,V2ABS,&
                    lineOff,XsectOff,contnmOff,IXSBIN,XSFILE,IXFORM,NSPECR,NTEMPF,XDOPLR,LnOrXs,NUMXS,&
                    NOPR,NFHDRF,NPHDRF,NLNGTH, &
-                   numNarrowLines, narrowWidth)
+                   numNarrowLines, narrowWidth, sdep_voigt_flag)
 
       DPTMIN = DPTMST
       !CALL CPUTIM (TIME1)
@@ -964,7 +965,7 @@ endif
   925 FORMAT ('0 TIME LEAVING OPDPTH ',F15.3,'  TOTAL FOR LAYER ',      &
      &        F15.3)
 
-      END  SUBROUTINE
+      END  SUBROUTINE OPDPTH
 
 
 !-----------------------------------------------------------------------
@@ -1007,7 +1008,7 @@ endif
                          ABSRB,DVABS,V1ABS,V2ABS,&
                          lineOff,XsectOff,contnmOff,IXSBIN,XSFILE,IXFORM,NSPECR,NTEMPF,XDOPLR,LnOrXs,NUMXS,&
                          NOPR,NFHDRF,NPHDRF,NLNGTH, &
-                         numNarrowLines, narrowWidth)
+                         numNarrowLines, narrowWidth, sdep_voigt_flag)
 !-----------------------------------------------------------------------
       USE Module_ConstParam       ,ONLY: r8=>kind_r8,RADCN2, &
                                          MXMOL,MXISOTPL,NFPTS,NFMX, &
@@ -1018,7 +1019,7 @@ endif
       USE Module_LineF4           ,ONLY: LBLF4Q
       USE Module_XSect            ,ONLY: XSECTM
       USE Module_Config           ,ONLY: IPR
-
+      USE voigt_module,            ONLY: VOIGT_FLAG, LSF_VOIGTQ 
       IMPLICIT NONE !REAL*8           (V)
 
       real         ,intent(out)   :: r1Buffer(:) !may change to r1Buffer(:) in the future
@@ -1076,6 +1077,7 @@ endif
       !
       integer      ,intent(in)    :: numNarrowLines
       real         ,intent(in)    :: narrowWidth
+      logical,      intent(in)    :: sdep_voigt_flag
 
 
       !--- Local variables
@@ -1107,6 +1109,9 @@ endif
       real        :: BRD_MOL_TMP( MXBRDMOL,NLINEREC)
       real        :: BRD_MOL_SHFT(MXBRDMOL,NLINEREC)
       integer     :: IOUT(NLINEREC)
+
+      real        :: ALFAL( NLINEREC)                    ! Lorentz line half-width [cm^{-1}]
+      real        :: ALFAD( NLINEREC)                    ! Doppler broadening half-width [cm^{-1}]
 
       integer     :: N1MAX, N2MAX, N3MAX
       integer     :: NX1,   NX2,   NX3                ! CMSHAP
@@ -1180,6 +1185,7 @@ endif
       REAL         :: AVALF,     AVZETA,    BOUND,     BOUNF3
       REAL         :: DVSAV,     DV_LBL
       REAL(r8)     :: V1R4ST,    V2R4ST,    VF1,       VF2
+      REAL         :: SDEP(NLINEREC)
 
 
 
@@ -1191,25 +1197,29 @@ endif
 
 !     SET COMMON BLOCK CMSHAP
 
-      HWF1 = HWFF1
-      DXF1 = DXFF1
-      NX1 = NXF1
+      HWF1  = HWFF1
+      DXF1  = DXFF1
+      NX1   = NXF1
       N1MAX = NF1MAX
-      HWF2 = HWFF2
-      DXF2 = DXFF2
-      NX2 = NXF2
+      HWF2  = HWFF2
+      DXF2  = DXFF2
+      NX2   = NXF2
       N2MAX = NF2MAX
-      HWF3 = HWFF3
-      DXF3 = DXFF3
-      NX3 = NXF3
+      HWF3  = HWFF3
+      DXF3  = DXFF3
+      NX3   = NXF3
       N3MAX = NF3MAX
 
-      DPTMN = DPTMIN
-      IF (JRAD.NE.1) DPTMN = DPTMIN/RADFN(V2,TAVE/RADCN2)
-      DPTFC = DPTFAC
-      ILIN4 = 0
+      IF (JRAD .NE. 1) THEN
+         DPTMN = DPTMIN/RADFN(V2,TAVE/RADCN2)
+      ELSE
+         DPTMN = DPTMIN
+      END IF
+
+      DPTFC  = DPTFAC
+      ILIN4  = 0
       ILIN4T = 0
-      LIMIN = 250
+      LIMIN  = 250
       NSHIFT = 32
 
 !v128--->
@@ -1220,9 +1230,9 @@ endif
 ! sets ALFAL0 to a value less than 0.04.
 !    previous expression:  NBOUND = 4.*(2.*HWF3)*SAMPLE+0.01
 !
-      ALFMAX = 4.*ALFAV !4*SAMPLE*DV * 0.04/ALFAL0
+      ALFMAX  = 4.*ALFAV !4*SAMPLE*DV * 0.04/ALFAL0
       nALFMAX = ALFMAX/DV
-      NBOUND = (2.*HWF3)*nALFMAX+0.01
+      NBOUND  = (2.*HWF3)*nALFMAX+0.01
 
       NLIM1 = 2401
       NLIM2 = (NLIM1/4)+1
@@ -1247,14 +1257,14 @@ endif
       !TMOLEC = TMOLEC+TPAT1-TPAT0
       REWIND LINFIL
       IEOF = 0
-      ILO = 0
-      IHI = -999
+      ILO  = 0
+      IHI  = -999
       NMINUS = 0
       NPLUS = 0
 
 !     NOTE (DXF3/DXF1) IS 16 AND (DXF3/DXF2) IS 4
 
-      DVP = DV
+      DVP  = DV
       DVR2 = (DXF2/DXF1)*DV
       DVR3 = (DXF3/DXF1)*DV
       MAX1 = NSHIFT+NLIM1+NSHIFT+NBOUND/2
@@ -1285,7 +1295,7 @@ endif
       allocate( R4(lbR4:ubR4) )
 
       DO 10 I = 1, MAX1 !yma,151201
-         R1(I) = 0.
+         R1(1:MAX1) = 0.
    10 END DO
       DO 20 I = 1, MAX2
          R2(I) = 0.
@@ -1364,7 +1374,7 @@ endif
          CALL RDLIN( VNU,SP,ALFA0,EPP,MOL,HWHMS,TMPALF,PSHIFT,IFLG, &
                      BRD_MOL_FLG,BRD_MOL_HW,BRD_MOL_TMP,BRD_MOL_SHFT, &
                      IOUT, LINFIL,NLNGTH,ILO,IHI,LIMIN,VBOT,VTOP, &
-                     IDATA,IEOF,NOPR )
+                     IDATA,IEOF,NOPR, SDEP)
 
          !CALL CPUTIM (TIME)
          !TIMRDF = TIMRDF+TIME-TIME0
@@ -1382,20 +1392,28 @@ endif
                       VFT,HWF3,ILNFLG,DVR4,V1R4,NPTR4,R4,DPTFC,DPTMN,&
                       NCHNG,NLIN,NMINUS,NPLUS,SUMALF,SUMZET,LINCNT,&
                       lnMolNames,NLTE,speciesBroad,JRAD, &
-                      numNarrowLines, narrowWidth )
+                      numNarrowLines, narrowWidth, ALFAL, ALFAD  )
          !CALL CPUTIM(TPAT1)
          !TLNCOR = TLNCOR+TPAT1-TPAT0
 
    70    CONTINUE
 
+         IF (sdep_voigt_flag) then
+            if (dbg) print *, 'INFO::HIRACQ:: LSF_VOIGTQ invoked'
+            CALL LSF_VOIGTQ( VNU,SP,EPP,SPPSP,RECALF,&
+                         R1,R2,R3,RR1,RR2,RR3,lbR1,lbR2,lbR3, &
+                         DV,DVR2,DVR3,HWF1,HWF2,HWF3,DXF1,NX1,NX2,NX3,&
+                         VFT,ILO,IHI,MAX1,IOUT,IPANEL,IDATA, &
+                         ALFAL, ALFAD, SDEP )
 
-         CALL CNVFNQ( VNU,SP,EPP,SPPSP,RECALF, & ! SABS=>SP,SRAD=>EPP
-                      R1,R2,R3,RR1,RR2,RR3,lbR1,lbR2,lbR3, F1,F2,F3,FG,XVER, &
-                      ZETAI,IZETA, &
-                      DV,DVR2,DVR3,HWF1,DXF1,NX1,NX2,NX3,&
-                      VFT,ILO,IHI,MAX1,IOUT,IPANEL,IDATA )
-
-
+         ELSE
+            if (dbg) print *, 'INFO::HIRACQ:: CNVFNQ invoked'
+            CALL CNVFNQ( VNU,SP,EPP,SPPSP,RECALF, & ! SABS=>SP,SRAD=>EPP
+                         R1,R2,R3,RR1,RR2,RR3,lbR1,lbR2,lbR3, F1,F2,F3,FG,XVER, &
+                         ZETAI,IZETA, &
+                         DV,DVR2,DVR3,HWF1,DXF1,NX1,NX2,NX3,&
+                         VFT,ILO,IHI,MAX1,IOUT,IPANEL,IDATA)
+         ENDIF
       IF (IPANEL.EQ.0) GO TO 60 !the record of lines used up, go to read more lines
 
    80 CONTINUE
@@ -1469,9 +1487,9 @@ endif
       IF (ISTOP.NE.1) THEN
          IF (ILBLF4.GE.1) THEN
 
-            VF1 = VFT-2.*DVR4
-            VF1 = V1+floor((VF1-V1)/DVR4)*DVR4
-            VF2 = VFT+2.*DVR4+ REAL(N2R3+4)*DVR3
+            VF1 = VFT - 2.*DVR4
+            VF1 = V1  + floor((VF1-V1)/DVR4)*DVR4
+            VF2 = VFT + 2.*DVR4 + REAL(N2R3+4)*DVR3
 
             IF (VF2.GT.V2R4.AND.V2R4.NE.V2R4ST) THEN
 
@@ -1492,11 +1510,11 @@ endif
                                IXSBIN,JRAD,ILBLF4,DPTMIN,NFHDRF,NPHDRF )
                   !CALL CPUTIM (TIME)
                   !TXS = TXS+TIME-TIME0
-               ENDIF
-            ENDIF
-         ENDIF
+               END IF
+            END IF
+         END IF
          GO TO 70
-      ENDIF
+      END IF
 
       !CALL CPUTIM (TIMEH1)
       !TIME = TIMEH1-TIMEH0-TF4-TXS
@@ -1504,11 +1522,11 @@ endif
       IF (NOPR.NE.1) THEN
          IF (ILBLF4.GE.1) WRITE (IPR,905) DVR4,BOUND4
          IF (NMINUS.GT.0) WRITE (IPR,910) NMINUS
-         IF (NPLUS.GT.0) WRITE (IPR,915) NPLUS
+         IF (NPLUS .GT.0) WRITE (IPR,915) NPLUS
          WRITE (IPR,*) "NLIN,LINCNT,NCHNG=", NLIN,LINCNT,NCHNG
 
          IF (LINCNT.GE.1) THEN
-            AVALF = SUMALF/ REAL(LINCNT)
+            AVALF  = SUMALF/ REAL(LINCNT)
             AVZETA = SUMZET/ REAL(LINCNT)
          ENDIF
          WRITE (IPR,925) AVALF,AVZETA
@@ -1559,7 +1577,7 @@ endif
      &          'SHAPEG, VERFN, MOLEC, and other loops and ',           &
      &          'file maintenance within HIRAC',/)
 
-      END SUBROUTINE
+      END SUBROUTINE HIRACQ
 
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
@@ -1572,7 +1590,8 @@ endif
                          VFT,HWF3,ILNFLG,DVR4,V1R4,NPTR4,R4,DPTFC,DPTMN,&
                          NCHNG,NLIN,NMINUS,NPLUS,SUMALF,SUMZET,LINCNT,&
                          molNames,NLTE,speciesBroad,JRAD,&
-                         numNarrowLines, narrowWidth )
+                         numNarrowLines, narrowWidth, &
+                         ALFALout, ALFADout )
 !-----------------------------------------------------------------------
       USE Module_ConstParam       ,ONLY: r8=>kind_r8, RADCN2, ONEPL, &
                                          MXMOL,MAX_ISO,MXISOTPL,MaxISOTPL_smass,MAXSTATE,&
@@ -1639,6 +1658,8 @@ endif
       integer      ,intent(in)    :: JRAD
       integer      ,intent(in)    :: numNarrowLines !number of narrow lines counted in LINF4. used here as an indicator to turn on/off skipping narrow lines
       real         ,intent(in)    :: narrowWidth
+      real, optional, intent(out) :: ALFALout(:)   ! Lorentz half width [cm^{-1}]
+      real, optional, intent(out) :: ALFADout(:)   ! Lorentz half width [cm^{-1}]
 
 
       !--- Local variables
@@ -1766,7 +1787,7 @@ endif
                   v1x = xsTbl%V1FX(is,xsNum(ind))
                   v2x = xsTbl%V2FX(is,xsNum(ind))
                   if ( v1x < VNU(I).and.VNU(I) < v2x ) then
-                     if( xsTbl%lineOrXs(is, xsNum(ind)) /=1 ) then
+                     if( xsTbl%lineOrXs(is, xsNum(ind)) /= 1 ) then
                         GO TO 25 !This interval handeled using xs section
                      else
                         EXIT !this interval handeled as line absorption.
@@ -1850,7 +1871,7 @@ endif
          ! IFLAG = 3 TREATS LINE COUPLING IN TERMS OF REDUCED WIDTHS
 
          VNU(I) = VNU(I)+RHORAT*PSHIFT(I)
-         if(sum(brd_mol_flg(:,i)).gt.0.AND. speciesBroad) then
+         if ( (sum(brd_mol_flg(:,i)).gt.0) .AND. speciesBroad) then
             vnu(i) = vnu(i)+sum( rhoslf(1:mxbrdmol)*brd_mol_flg(:,i)* &
      &                           (brd_mol_shft(:,i)-pshift(i)) )
          endif
@@ -1885,6 +1906,10 @@ endif
          IF (IFLAG.EQ.3) ALFL = ALFL*(1.0-GAMMA1*PAVP0-GAMMA2*PAVP2)
 
          ALFAD = VNU(I)*ALFD1(m,iso)
+
+         if (present(ALFALout)) ALFALout(I) = ALFL
+         if (present(ALFADout)) ALFADout(I) = ALFAD
+
          ZETA = ALFL/(ALFL+ALFAD)
          ZETAI(I) = ZETA
          FZETA = 100.*ZETA
@@ -1936,7 +1961,7 @@ endif
 
 
          SP(I) = SUI*(1.+GI*PAVP2)
-         SPPI = SUI*YI*PAVP0
+         SPPI  = SUI*YI*PAVP0
          SPPSP(I) = SPPI/SP(I)
          SRAD(I)=0.0
 
@@ -1955,18 +1980,18 @@ endif
             ! PICK OUT MOLECULAR TYPES WITH VIBRATIONAL STATES
 
             IF(NUMSTATE(M).GT.0) THEN
-             IF (NLOW.GT.NUMSTATE(M)) STOP 'NLOW GT NUMSTATE IN LNCORQ'
+               IF (NLOW.GT.NUMSTATE(M)) STOP 'NLOW GT NUMSTATE IN LNCORQ'
                INDLOW=NLOW + (ISO-1)*MAXSTATE
                IF (NLOW.GT.0) RLOW=RATSTATE(INDLOW,M)
-             IF (NUPP.GT.NUMSTATE(M)) STOP 'NUPP GT NUMSTATE IN LNCORQ'
+               IF (NUPP.GT.NUMSTATE(M)) STOP 'NUPP GT NUMSTATE IN LNCORQ'
                INDUPP=NUPP + (ISO-1)*MAXSTATE
                IF (NUPP.GT.0) RUPP=RATSTATE(INDUPP,M)
             ELSE
                PRINT 900,M
   900        FORMAT('LNCORQ: MOL IN TROUBLE',I10)
-               SP(I)=0.
-               SRAD(I)=0.
-               SPPSP(I)=0.
+               SP(I)    = 0.
+               SRAD(I)  = 0.
+               SPPSP(I) = 0.
                GO TO 30
             END IF
 
@@ -2027,8 +2052,8 @@ endif
 
          GO TO 30
 
-   25    SP(I)=0.0
-         SRAD(I)=0.0
+   25    SP(I)    = 0.0
+         SRAD(I)  = 0.0
          SPPSP(I) = 0.0
 
    30 END DO
@@ -2038,7 +2063,7 @@ endif
 
 
       RETURN
-      END SUBROUTINE
+      END SUBROUTINE LNCORQ
 
 !-----------------------------------------------------------------------
 !     SUBROUTINE CNVFNV PERFORMS THE CONVOLUTION OF THE LINE DATA WITH
@@ -2171,7 +2196,7 @@ endif
                ZF2 = ZF2L
                ZF3 = ZF3L
 !
-               DO 10 J1 = JMIN1, JMAX1
+               DO J1 = JMIN1, JMAX1
                   J2 = J1-J2SHFT
                   J3 = J1-J3SHFT
                   ZF3 = ZF3+ZSLOPE
@@ -2190,7 +2215,7 @@ endif
                      RR1(J1) = RR1(J1)+STRFR1*F1(IZ1)+STRDR*FG(IZ1)     &
                      +STRVRR*XVER(IZ1)
                   ENDIF
-   10          CONTINUE
+               END DO   
 
                IF (SPPSP(I).NE.0.) THEN
 
@@ -2255,7 +2280,7 @@ endif
       !TIMCNV = TIMCNV+TIME-TIME0
       RETURN
 
-      END  SUBROUTINE
+      END SUBROUTINE CNVFNQ
 
 !-----------------------------------------------------------------------
 !     SUBROUTINE PANEL COMBINES RESULTS OF R3, R2, AND R1 INTO R1 ARRAY
@@ -2328,18 +2353,15 @@ endif
       INTEGER  :: LIMHI,  LIMLO, NPTSI1,  NPTSI2
       REAL     :: RADVI, RDEL,    RDLAST
       REAL(r8) :: VI,     VITST
-      REAL     :: X00,    X01,   X02,     X03
-      REAL     :: X10,    X11,   XKT
+      REAL     :: XKT
 
+      REAL, PARAMETER :: X00 = -7./128.
+      REAL, PARAMETER :: X01 = 105./128.
+      REAL, PARAMETER :: X02 = 35./128.
+      REAL, PARAMETER :: X03 = -5./128.
+      REAL, PARAMETER :: X10 = -1./16.
+      REAL, PARAMETER :: X11 = 9./16.
 
-
-      !CALL CPUTIM (TIME0)
-      X00 = -7./128.
-      X01 = 105./128.
-      X02 = 35./128.
-      X03 = -5./128.
-      X10 = -1./16.
-      X11 = 9./16.
       ISTOP = 0
 
 !     Test for last panel.  If last, set the last point to one point
@@ -2379,7 +2401,7 @@ endif
                            X01*R3(J3+1)+ &
                            X00*R3(J3+2)
 
-   10 END DO
+      10 END DO
       if ( NLTE ) then !NLTE case
          DO J = LIMLO, LIMHI, 4
             J3 = (J-1)/4+1
@@ -2400,9 +2422,9 @@ endif
       !--- If the last panel, interpolate the first point of the next 4-DV2 segment
       ! The first point is exactly aligned, so interpolation is simply taking the
       ! corresponding R3 value.
-      if (LIMLO<=LIMHI .and. ISTOP==1) then
-         J3 = J3 + 1
-         R2(J) = R2(J)+R3(J3)
+      if (LIMLO <= LIMHI .and. ISTOP==1) then
+         J3      = J3 + 1
+         R2(J)   = R2(J)+R3(J3)
          R2(J+1) = R2(J+1)+X00*R3(J3-1)+X01*R3(J3)+X02*R3(J3+1)+X03*R3(J3+2)
          if ( NLTE ) RR2(J) = RR2(J) + RR3(J3)
       endif
@@ -2423,7 +2445,7 @@ endif
                            X01*R2(J2+1)+ &
                            X00*R2(J2+2)
 
-   20 END DO
+      20 END DO
       if ( NLTE ) then !NLTE case
          DO J = NLO, NHI, 4
             J2 = (J-1)/4+1
@@ -2542,12 +2564,7 @@ endif
       !TIMPNL = TIMPNL+TIME-TIME0
 
       RETURN
-      END SUBROUTINE
-
-
-
-
-
+      END SUBROUTINE panelOut
 
  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -2571,7 +2588,7 @@ endif
       SUBROUTINE RDLIN( VNU,SP,ALFA0,EPP,MOL,HWHMS,TMPALF,PSHIFT,IFLG, &
                         BRD_MOL_FLG,BRD_MOL_HW,BRD_MOL_TMP,BRD_MOL_SHFT, &
                         IOUT, LINFIL,NLNGTH,ILO,IHI,LIMIN,VBOT,VTOP, &
-                        IDATA,IEOF,NOPR )
+                        IDATA,IEOF,NOPR, SDEP)
 !-----------------------------------------------------------------------
       USE Module_ConstParam  ,ONLY: r8=>kind_r8
       USE Module_LineData    ,ONLY: MXBRDMOL, NLINEREC, &
@@ -2602,12 +2619,12 @@ endif
       integer   ,intent(out)   :: IDATA
       integer   ,intent(inout) :: IEOF
       integer   ,intent(in)    :: NOPR
+      real      ,intent(inout) :: SDEP(NLINEREC)
 
 
       !--- Local variables
       !
       character*8 :: HLINID(10)
-      real        :: SDEP(NLINEREC)
       integer*4   :: N_NEGEPP(64)
       integer*4   :: N_RESETEPP(64)
       real*4      :: XSPACE(4096)
@@ -2795,7 +2812,7 @@ endif
      &   ' FIRST LINE ON LINFIL USED (MORE LINES MAY BE REQUIRED) ')
   950 FORMAT (8a1)
 
-      END SUBROUTINE
+      END SUBROUTINE RDLIN
 
 !-----------------------------------------------------------------------
 !     SUBROUTINE SHAPEL CONSTRUCTS THE SUB-FUNCTIONS FOR THE
@@ -2906,7 +2923,7 @@ endif
       TOTAL = TOTAL+SUM
 
       RETURN
-      END SUBROUTINE
+      END SUBROUTINE SHAPEL
 
 !-----------------------------------------------------------------------
 !     SUBROUTINE SHAPEG CONSTRUCTS THE FUNCTION FOR THE DOPPLER PROFILE
@@ -2950,7 +2967,7 @@ endif
       TOTAL = TOTAL+SUM
 
       RETURN
-      END SUBROUTINE
+      END SUBROUTINE SHAPEG
 
 !-----------------------------------------------------------------------
 !     VERFN IS A FUNCTION USED TO IMPROVE THE ACCURACY OF THE
@@ -3013,7 +3030,7 @@ endif
 
 !  900 FORMAT (F10.3,6F15.10)
 
-      END SUBROUTINE
+      END SUBROUTINE VERFN
 
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
@@ -3082,7 +3099,7 @@ endif
    30 END DO
 
    40 RETURN
-      END SUBROUTINE
+      END SUBROUTINE RSYM
 
 
 
@@ -3224,7 +3241,7 @@ endif
   930 FORMAT(//)
 
       RETURN
-      END SUBROUTINE
+      END SUBROUTINE nonLTE_RatState
 
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
@@ -3515,7 +3532,7 @@ endif
       end do
 
       RETURN
-      END SUBROUTINE
+      END SUBROUTINE DEFNLTEDAT
 
 
 !-----------------------------------------------------------------------
@@ -3562,7 +3579,7 @@ endif
 !##     STOP 'ERROR READING NLTE DATA FROM TAPE4'
 
       RETURN
-      END SUBROUTINE
+      END SUBROUTINE GETINDEX
 
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
@@ -3667,7 +3684,7 @@ endif
 
       GO TO 50
 
-      END SUBROUTINE
+      END SUBROUTINE RDNLTE
 
 
 !-----------------------------------------------------------------------
@@ -3828,7 +3845,7 @@ endif
   935 FORMAT ('ISOTOPE',2X,'VIB',10X,'E(CM-1)',11X,'POP LTE',7X,        &
      & 'POP NLTE',6X,'NLTE/LTE',7X,'NLTE TMP',7X,'NLTE POP ORIG')
 
-      END SUBROUTINE
+      END SUBROUTINE VIBPOP
 
 
 !-----------------------------------------------------------------------
@@ -4030,7 +4047,7 @@ endif
   935 FORMAT ('ISOTOPE',9X,'VIB E(CM-1)',9X,'POP LTE    POP NLTE ',     &
      &     'NLTE/LTE    NLTE TMP 2-STATE NLTE TMP')
 
-      END SUBROUTINE
+      END SUBROUTINE VIBTMP
 
 
 !-----------------------------------------------------------------------
@@ -4049,7 +4066,7 @@ endif
       IF(TEXTLINE(1:2).EQ.'--') RETURN
       GO TO 10
    50 RETURN
-      END SUBROUTINE
+      END SUBROUTINE RDSKIP
 
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
@@ -4100,8 +4117,6 @@ endif
       write(ipr,*) 'T2=',(t2(i),i=1,num)
       STOP 'ERROR IN LININT FOR Tvib INPUT'
 
-      END SUBROUTINE
+      END SUBROUTINE LININT
 
-
-
-END MODULE
+END MODULE Module_ODLAY

@@ -9,3 +9,10 @@ clblm_out_*
 *.log
 z_*
 zz_*
+.DS_Store
+release_examples/*
+*.o
+*.mod
+clblm
+build_solar
+scene_writer

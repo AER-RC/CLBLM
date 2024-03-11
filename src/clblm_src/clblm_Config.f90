@@ -110,6 +110,8 @@ MODULE Module_Config
       integer :: JRAD   =1                       ! JRAD=  1  RADIATION TERM INCLUDED IN LINE STRENGTHS
                                                  ! JRAD=  0  RADIATION TERM PUT IN BY PANEL
                                                  ! JRAD= -1  NO RADIATION TERM IN ABSORPTION COEFFICIENTS
+      logical :: sdep_voigt_flag = .FALSE.       ! Flag to turn on Speed dependent Voigt profile
+
    END TYPE
 
 
@@ -767,8 +769,9 @@ CONTAINS !=================== MODULE CONTAINS ==========================
     if (    od_flags%p_convolution==0) then; odCtrl%xsPressConv=.FALSE.;
     elseif (od_flags%p_convolution==1) then; odCtrl%xsPressConv=.TRUE.;
     endif
-
-    !--- Continuum scaling factors. Must be in the order of
+    ! speed dependent vVoigt flag
+    odCtrl%sdep_voigt_flag = ( od_flags%sdep_voigt_flag == 1 )
+    !--- Continuum scaling factors. Must be in the order of 
     !   [XSELF,XFRGN,XCO2C,XO3CN,XO2CN,XN2CN,XRAYL]
     if (od_flags%continuum_scaling(1)>=0.) odCtrl%XSELF = od_flags%continuum_scaling(1)
     if (od_flags%continuum_scaling(2)>=0.) odCtrl%XFRGN = od_flags%continuum_scaling(2)

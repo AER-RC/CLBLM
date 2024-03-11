@@ -133,6 +133,9 @@ type od_flags_type
     ! Tables say this should be a 7-element array; JSON files have this as a dictionary. FIXME
     ! Keeping as an array.  It's easier that way.
     real :: continuum_scaling(NUM_CONTINUUM_ELEMENTS) = FILLER_FLOAT
+    ! by default SDEP is off
+    ! to turn it on set it to 1
+    integer :: sdep_voigt_flag               = -1
 end type
 
 
