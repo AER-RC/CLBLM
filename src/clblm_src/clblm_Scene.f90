@@ -848,7 +848,7 @@ CONTAINS  !===================== Module Contains =======================
       !--- Check if all scenes have the same molecules
       if (scn%prfl%nMol /= numMol) STOP '--- '//routineName//'(): All scenes in a file should have the same number of molecules.'
       do im=1,numMol
-         if ( upper(trim(adjustl(scn%prfl%molID(im)))) /= upper(trim(adjustl(molID(im)))) ) then
+         if ( trim(adjustl(scn%prfl%molID(im))) /= trim(adjustl(molID(im))) ) then
             STOP '--- '//routineName//'(): All scenes in a file must consist of same molecules.'
          endif
       enddo

@@ -764,7 +764,7 @@ CONTAINS !=================== MODULE CONTAINS ==========================
          ! If unit is mixing ratio and  molecule is not water vapour
          ! denWat and unitWat must be present.
          if ( (molUnit==10 .OR. molUnit==12) .AND. &
-               upper(trim(adjustl(prfl%molID(im))))/='H2O' ) then
+               trim(adjustl(prfl%molID(im)))/='H2O' ) then
 
             call molDensity2numDen( numDen,&
                                     prfl%Q(im,1:nLev)       ,&
@@ -1484,8 +1484,8 @@ CONTAINS !=================== MODULE CONTAINS ==========================
 
             molK = prfl%molID(K)
 
-            if ( upper(trim(adjustl( molID(im) ))) == &
-                 upper(trim(adjustl( molK )))  ) then
+            if ( trim(adjustl( molID(im) )) == &
+                 trim(adjustl( molK ))  ) then
 
                Loc = K
                exit

@@ -130,10 +130,10 @@ MODULE Module_ConstParam
    character(6) ,PARAMETER :: clblmMolNames(1:MXMOL) =[ &   !removed the 0 element ('ALL') from clblmMolNames
         '   H2O','   CO2','    O3','   N2O','    CO','   CH4','    O2',   &
         '    NO','   SO2','   NO2','   NH3','  HNO3','    OH','    HF',   &
-        '   HCl','   HBr','    HI','   ClO','   OCS','  H2CO','  HOCl',   &
-        '    N2','   HCN',' CH3Cl','  H2O2','  C2H2','  C2H6','   PH3',   &
-        '  COF2','   SF6','   H2S',' HCOOH','   HO2','     O','ClONO2',   &
-        '   NO+','  HOBr','  C2H4',' CH3OH',' CH3Br',' CH3CN','  CF4 ',   &
+        '   HCL','   HBR','    HI','   CLO','   OCS','  H2CO','  HOCL',   &
+        '    N2','   HCN',' CH3CL','  H2O2','  C2H2','  C2H6','   PH3',   &
+        '  COF2','   SF6','   H2S',' HCOOH','   HO2','     O','CLONO2',   &
+        '   NO+','  HOBR','  C2H4',' CH3OH',' CH3BR',' CH3CN','  CF4 ',   &
         ' C4H2 ',' HC3N ','   H2 ','   CS ','  SO3 ']
 
    ! MOLECULAR WEIGHTS
@@ -839,8 +839,8 @@ CONTAINS !=================== MODULE CONTAINS ==========================
 
       molIndex = -1
       do im=1,size(molArray)
-         if ( upper(trim(adjustl( molArray(im) ))) == &
-              upper(trim(adjustl( molName ))) )then
+         if ( trim(adjustl( molArray(im) )) == &
+              trim(adjustl( molName )) )then
             molIndex = im
             EXIT
          endif
@@ -962,10 +962,10 @@ CONTAINS !=================== MODULE CONTAINS ==========================
       integer :: xsNo
 
       xsNo = xsMolNum( xsName )
-      if (upper(trim(adjustl( xsMolName( xsNo, 1 ) ))) == upper(trim(adjustl( lnName ))) .or. &
-          upper(trim(adjustl( xsMolName( xsNo, 2 ) ))) == upper(trim(adjustl( lnName ))) .or. &
-          upper(trim(adjustl( xsMolName( xsNo, 3 ) ))) == upper(trim(adjustl( lnName ))) .or. &
-          upper(trim(adjustl( xsMolName( xsNo, 4 ) ))) == upper(trim(adjustl( lnName ))) ) then
+      if (trim(adjustl( xsMolName( xsNo, 1 ) )) == trim(adjustl( lnName )) .or. &
+          trim(adjustl( xsMolName( xsNo, 2 ) )) == trim(adjustl( lnName )) .or. &
+          trim(adjustl( xsMolName( xsNo, 3 ) )) == trim(adjustl( lnName )) .or. &
+          trim(adjustl( xsMolName( xsNo, 4 ) )) == trim(adjustl( lnName )) ) then
 
          XsName_LnName_areEqual = .TRUE.
       else
